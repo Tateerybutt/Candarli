@@ -1,0 +1,231 @@
+<!-- ================================
+     SITE PIN LOCK
+================================ -->
+
+<div id="site-pin-lock" class="site-pin-lock" role="dialog" aria-modal="true" aria-labelledby="site-pin-title">
+
+    
+    <div class="site-pin-box">
+
+        <div class="site-pin-icon">
+            <img src="assets/logo.png" alt="Çandarli">
+        </div>
+
+        <div class="site-pin-heading">
+
+            <h1 id="site-pin-title">
+                Welcome back
+            </h1>
+
+            <p>
+                Enter your PIN to open Çandarli.
+            </p>
+
+        </div>
+
+
+        <form id="site-pin-form">
+
+            <label for="site-pin-input" class="sr-only">
+                PIN
+            </label>
+
+            <input id="site-pin-input" type="password" inputmode="numeric" autocomplete="off" maxlength="20"
+                placeholder="Enter PIN" aria-label="Site PIN" aria-describedby="site-pin-error" required>
+
+            <button id="site-pin-submit" type="submit">
+                Unlock
+            </button>
+
+        </form>
+
+
+        <p id="site-pin-error" class="site-pin-error" aria-live="polite"></p>
+
+    </div>
+    
+
+</div>
+
+
+<!-- ================================
+     NAVBAR
+================================ -->
+
+<nav id="navbar-component" class="navbar">
+
+    
+    <div class="navbar-container">
+
+        <!-- Brand -->
+
+        <a href="index.html" class="brand" aria-label="Çandarli Home">
+
+            <img src="assets/logo.png" alt="Çandarli">
+
+        </a>
+
+
+        <!-- Navigation -->
+
+        <div class="nav-links">
+
+            <a href="journal.html" class="nav-link" data-page="journal">
+                Furnace
+            </a>
+
+            <a href="codes.html" class="nav-link" data-page="codes" aria-disabled="true">
+                Codes
+            </a>
+
+            <a href="#" class="nav-link disabled" data-page="tasks" aria-disabled="true">
+                Tasks
+            </a>
+
+        </div>
+
+
+        <!-- Right side -->
+
+        <div class="nav-right">
+
+            <div class="connection-status" id="connection-status" role="status" aria-live="polite">
+
+                <span class="status-dot" aria-hidden="true"></span>
+
+                <span class="status-text">
+                    Online
+                </span>
+
+            </div>
+
+
+            <button class="nav-link" id="profile-button" type="button">
+                Sign In
+            </button>
+
+        </div>
+
+    </div>
+    
+
+</nav>
+
+<!-- ================================
+     FOOTER
+================================ -->
+
+<footer id="footer-component" class="footer">
+
+    
+    <div class="footer-container">
+
+        <div class="footer-top">
+
+            <div class="footer-brand">
+
+                <span class="footer-logo">
+                    Çandarli
+                </span>
+
+                <p>
+                    Your space for thoughts,
+                    ideas, and memories.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="footer-bottom">
+
+            <span>
+                © 2026 Çandarli
+            </span>
+
+            <span>
+                Made with ♥
+            </span>
+
+        </div>
+
+    </div>
+    
+
+</footer>
+
+<!-- ================================
+     CONFIRMATION MODAL
+================================ -->
+
+<div id="confirm-modal" class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+
+    
+    <div class="confirm-modal-box">
+
+        <h2 id="confirm-modal-title">
+            Are you sure?
+        </h2>
+
+        <p id="confirm-modal-message">
+            This action cannot be undone.
+        </p>
+
+        <div class="confirm-modal-actions">
+
+            <button id="confirm-cancel" type="button">
+                Cancel
+            </button>
+
+            <button id="confirm-action" class="danger-button" type="button">
+                Delete
+            </button>
+
+        </div>
+
+    </div>
+    
+
+</div>
+
+<!-- ================================
+     NOTIFICATION
+================================ -->
+
+<div id="notification" class="notification" role="status" aria-live="polite" aria-atomic="true">
+
+    
+    <span id="notification-message"></span>
+    
+
+</div>
+
+<!-- ================================
+     EDITOR TOOLBAR
+================================ -->
+
+<div id="editor-toolbar-component" class="editor-toolbar">
+
+    <button type="button" class="editor-tool" data-command="bold" title="Bold" aria-label="Bold">
+        <i class="fa-solid fa-bold"></i>
+    </button>
+
+    <button type="button" class="editor-tool" data-command="italic" title="Italic" aria-label="Italic">
+        <i class="fa-solid fa-italic"></i>
+    </button>
+
+    <button type="button" class="editor-tool" data-command="underline" title="Underline" aria-label="Underline">
+        <i class="fa-solid fa-underline"></i>
+    </button>
+
+    <span class="editor-toolbar-divider"></span>
+
+    <select id="editor-heading" class="editor-heading" aria-label="Text style">
+        <option value="p">Normal</option>
+        <option value="h1">Heading 1</option>
+        <option value="h2">Heading 2</option>
+        <option value="h3">Heading 3</option>
+    </select>
+
+</div>

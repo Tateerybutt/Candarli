@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Çandarli</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="icon" type="image/x-icon" href="assets/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png">
+    <link rel="manifest" href="site.webmanifest">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body data-page="home">
+
+    <div id="navbar"></div>
+
+    <main class="main home-main">
+        <div class="page-container">
+
+            <section class="os-header">
+                <div>
+                    <h1 id="home-greeting">Welcome back.</h1>
+                    <p class="os-subtitle">
+                        Your personal space, all in one place.
+                    </p>
+                </div>
+
+                <div class="os-date" id="os-date"></div>
+            </section>
+
+            <section class="os-dashboard">
+
+                <!-- FURNACE -->
+                <a href="journal.html" class="widget widget-furnace">
+
+                    <div class="widget-furnace-header">
+                        <div class="widget-furnace-title">
+                            <div class="widget-furnace-icon">
+                                <img src="assets/icons/coal.png" alt="Coal">
+                            </div>
+
+                            <div>
+                                <h2>Furnace</h2>
+                                <p>Personal Journal</p>
+                            </div>
+                        </div>
+
+                        <i class="fa-solid fa-arrow-up-right-from-square widget-arrow"></i>
+                    </div>
+
+                    <div class="widget-furnace-main">
+                        <div class="furnace-streak">
+                            <strong id="home-streak">—</strong>
+                            <span>day streak</span>
+                        </div>
+
+                        <div class="furnace-smolders">
+                            <strong id="home-smolders">—</strong>
+                            <span>Smolders</span>
+                        </div>
+                    </div>
+
+                    <div class="widget-furnace-footer">
+                        <span>Devam et.</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+
+                </a>
+
+            </section>
+
+        </div>
+    </main>
+
+    <div id="footer"></div>
+
+    <script type="module" src="./js/component.js"></script>
+    <script type="module" src="./js/home.js"></script>
+
+</body>
+
+</html>

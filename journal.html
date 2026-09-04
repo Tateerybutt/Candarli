@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Çandarli — Furnace</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="icon" type="image/x-icon" href="assets/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png">
+    <link rel="manifest" href="site.webmanifest">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/journal.css">
+</head>
+
+<body data-page="journal">
+
+    <!-- Navbar -->
+    <div id="navbar"></div>
+
+    <main class="main">
+        <div class="page-container journal-page">
+
+            <!-- Journal List -->
+            <section id="journal-list" class="journal-view">
+
+                <header class="journal-header">
+                    <div class="journal-heading">
+                        <h1>Furnace</h1>
+                        <p>Your thoughts, your space.</p>
+                    </div>
+
+                    <button class="primary-button" id="new-entry-button" type="button">
+                        + Add Fuel
+                    </button>
+                </header>
+
+                <div class="journal-layout">
+
+                    <!-- Entries -->
+                    <section class="journal-entries-panel">
+
+                        <div class="journal-filters">
+                            <div class="month-filter">
+                                <button id="journal-month-button" class="filter-button" type="button">
+                                    All Months
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </button>
+
+                                <div id="journal-month-menu" class="month-filter-menu hidden">
+                                    <div class="month-filter-selects">
+                                        <select id="journal-month-select" aria-label="Select month">
+                                            <option value="all">All</option>
+                                        </select>
+
+                                        <select id="journal-year-select" aria-label="Select year">
+                                            <option value="all">All</option>
+                                        </select>
+                                    </div>
+
+                                    <button id="journal-all-months" class="month-all-button" type="button">
+                                        All Months
+                                    </button>
+                                </div>
+                            </div>
+
+                            <select id="journal-sort-filter" class="filter-button" aria-label="Sort entries">
+                                <option value="newest">Newest first</option>
+                                <option value="oldest">Oldest first</option>
+                            </select>
+                        </div>
+
+                        <div class="entries-container" id="entries-container">
+                            <div class="empty-state" id="empty-state">
+
+                                <div class="empty-icon">✎</div>
+
+                                <h2>No fuel added</h2>
+
+                                <p>
+                                    Start writing down what's on your mind.
+                                </p>
+
+                                <button class="primary-button" id="empty-new-entry-button" type="button">
+                                    Get furnace to fire by adding your first Fuel
+                                </button>
+
+                            </div>
+                        </div>
+
+                    </section>
+
+
+                    <!-- Right Sidebar -->
+                    <aside class="journal-sidebar">
+
+                        <div class="journal-sidebar-card">
+
+                            <h2 class="journal-sidebar-title">
+                                <img src="assets/icons/coal.png" alt="" class="coal-icon">
+                                Coal
+                            </h2>
+
+                            <p class="journal-sidebar-subtitle">
+                                Devam et.
+                            </p>
+
+                            <div class="journal-sidebar-value">
+                                <span id="streak-value">0</span>
+                                <span id="streak-label">days</span>
+                            </div>
+
+                            <div class="coal-calendar">
+
+                                <div class="coal-calendar-header">
+                                    <button id="calendar-prev" class="calendar-nav" type="button">
+                                        <i class="fa-solid fa-chevron-left"></i>
+                                    </button>
+
+                                    <span id="calendar-month"></span>
+
+                                    <button id="calendar-next" class="calendar-nav" type="button">
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </button>
+                                </div>
+
+                                <div class="calendar-weekdays">
+                                    <span>M</span>
+                                    <span>T</span>
+                                    <span>W</span>
+                                    <span>T</span>
+                                    <span>F</span>
+                                    <span>S</span>
+                                    <span>S</span>
+                                </div>
+
+                                <div id="coal-calendar-grid" class="coal-calendar-grid">
+                                    <!-- Generated by JavaScript -->
+                                </div>
+
+                            </div>
+
+                            <div class="coal-smolders">
+                                <img src="assets/icons/coal-ember.png" alt="Smolders" class="smolder-icon">
+
+                                <div class="smolder-info">
+                                    <span id="smolder-value">0</span>
+                                    <span id="smolder-label">Smolders</span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </aside>
+
+                </div>
+
+            </section>
+
+            <section id="journal-editor" class="journal-view journal-editor hidden">
+
+                <div class="editor-header">
+                    <button id="back-to-journal" class="back-button" type="button">
+                        ← Back
+                    </button>
+
+                    <div class="editor-meta" id="editor-meta"></div>
+
+                    <button id="save-entry-button" class="primary-button" type="button">
+                        Save
+                    </button>
+                </div>
+
+                <div class="editor-content">
+
+                    <input type="text" id="entry-title" class="entry-title-input" placeholder="Fuel title..."
+                        maxlength="120" autocomplete="off">
+
+                    <div id="editor-toolbar"></div>
+
+                    <div id="entry-content" class="entry-content-input" contenteditable="true"
+                        data-placeholder="What's on your mind?"></div>
+
+                </div>
+
+            </section>
+
+            <section id="journal-reader" class="hidden">
+
+                <div class="reader-header">
+
+                    <button id="back-from-reader" class="back-button" type="button">
+                        ← Back
+                    </button>
+
+                    <div id="reader-meta" class="reader-meta">
+                    </div>
+
+                    <button id="edit-from-reader" class="primary-button" type="button">
+                        Edit
+                    </button>
+
+                </div>
+
+                <article class="reader-content">
+
+                    <h1 id="reader-title"></h1>
+
+                    <div class="reader-divider"></div>
+
+                    <div id="reader-body" class="reader-body">
+                    </div>
+
+                </article>
+
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div id="footer"></div>
+
+    <script type="module" src="./js/component.js"></script>
+    <script type="module" src="./js/db.js"></script>
+    <script type="module" src="./js/firebase.js"></script>
+    <script type="module" src="./js/journal.js"></script>
+    <script type="module" src="./js/coal.js"></script>
+</body>
+
+</html>

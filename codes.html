@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Çandarli — Codes</title>
+
+    <!-- ========================================
+         FONT
+    ======================================== -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+
+    <!-- ========================================
+         FAVICON
+    ======================================== -->
+
+    <link rel="icon" type="image/x-icon" href="assets/favicon/favicon.ico">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
+
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
+
+    <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png">
+
+    <link rel="manifest" href="site.webmanifest">
+
+
+    <!-- ========================================
+         FONT AWESOME
+    ======================================== -->
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+
+    <!-- ========================================
+         STYLES
+    ======================================== -->
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/codes.css">
+
+</head>
+
+
+<body data-page="codes">
+
+    <!-- ========================================
+         NAVBAR
+    ======================================== -->
+
+    <div id="navbar"></div>
+
+
+    <!-- ========================================
+         MAIN
+    ======================================== -->
+
+    <main class="main">
+
+        <div class="page-container codes-page">
+
+
+            <!-- ========================================
+                 CODES LIST
+            ======================================== -->
+
+            <section id="codes-list" class="codes-view">
+
+                <header class="codes-header">
+
+                    <div class="codes-heading">
+
+                        <h1>Codes</h1>
+
+                        <p>
+                            Your scripts, your space.
+                        </p>
+
+                    </div>
+
+
+                    <button id="new-script-button" class="codes-primary-button" type="button">
+                        + Add Script
+                    </button>
+
+                </header>
+
+
+                <section class="scripts-panel">
+
+                    <div id="scripts-container" class="scripts-container">
+
+                        <!-- Empty state -->
+
+                        <div id="codes-empty-state" class="codes-empty-state">
+
+                            <div class="codes-empty-icon">
+
+                                <i class="fa-solid fa-code"></i>
+
+                            </div>
+
+
+                            <h2>
+                                No scripts yet
+                            </h2>
+
+
+                            <p>
+                                Start writing something worth keeping.
+                            </p>
+
+
+                            <button id="empty-new-script-button" class="codes-primary-button" type="button">
+                                + Add your first Script
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </section>
+
+
+
+            <!-- ========================================
+                 SCRIPT EDITOR
+            ======================================== -->
+
+            <section id="codes-editor" class="codes-view hidden">
+
+                <div class="codes-editor-header">
+
+
+                    <!-- Back -->
+
+                    <button id="back-to-codes" class="codes-back-button" type="button">
+                        ← Back
+                    </button>
+
+
+                    <!-- Editor information -->
+
+                    <div id="codes-editor-meta" class="codes-editor-meta"></div>
+
+
+                    <!-- Save -->
+
+                    <button id="save-script-button" class="codes-primary-button" type="button">
+                        Save
+                    </button>
+
+                </div>
+
+
+                <div class="codes-editor-content">
+
+
+                    <!-- ========================================
+                         SHARED TOOLBAR
+                    ======================================== -->
+
+                    <div id="editor-toolbar"></div>
+
+
+                    <!-- ========================================
+                         SINGLE EDITABLE AREA
+
+                         Title + body are created by codes.js.
+
+                         There is NO separate title input.
+                         There is NO separate body input.
+                    ======================================== -->
+
+                    <div id="script-content" class="script-editor-content" contenteditable="true" spellcheck="true">
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+
+
+    <!-- ========================================
+         FOOTER
+    ======================================== -->
+
+    <div id="footer"></div>
+
+
+
+    <!-- ========================================
+         JAVASCRIPT
+    ======================================== -->
+
+    <script type="module" src="./js/component.js"></script>
+
+    <script type="module" src="./js/db.js"></script>
+
+    <script type="module" src="./js/firebase.js"></script>
+
+    <script type="module" src="./js/codes.js"></script>
+
+</body>
+
+</html>
