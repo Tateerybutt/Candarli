@@ -1,165 +1,338 @@
-/* ========================================
-   ÇANDARLI OS HOME
-======================================== */
-
 import {
     auth
 } from "./firebase.js";
 
 import {
-    onAuthStateChanged
+    GoogleAuthProvider,
+    onAuthStateChanged,
+    signInWithPopup,
+    signOut
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
-import {
-    openDatabase
-} from "./db.js";
-
-import {
-    getCurrentCoalStats
-} from "./coal.js";
-
 
 /* ========================================
-   DATE
+   GOOGLE SIGN IN
 ======================================== */
 
-const dateElement =
-    document.querySelector("#os-date");
+function setupGoogleSignIn() {
 
-if (dateElement) {
+    const button =
+        document.querySelector("#google-sign-in");
 
-    dateElement.textContent =
-        new Date().toLocaleDateString(
-            undefined,
-            {
-                weekday: "long",
-                month: "long",
-                day: "numeric",
-                year: "numeric"
+    const message =
+        document.querySelector("#auth-message");
+
+
+    if (!button) return;
+
+
+    /* ================================
+       AUTH STATE
+    ================================= */
+
+    onAuthStateChanged(auth, user => {
+
+        if (!user) return;
+
+        // User is already signed in.
+        // Redirect away from auth page.
+        if (
+            window.location.pathname.endsWith(
+                "/auth.html"
+            ) ||
+            window.location.pathname.endsWith(
+                "auth.html"
+            )
+        ) {
+            window.location.href = "index.html";
+        }
+
+    });
+
+
+    /* ================================
+       GOOGLE AUTHENTICATION
+    ================================= */
+
+    button.addEventListener(
+        "click",
+        async () => {
+
+            try {
+
+                button.disabled = true;
+
+                button.classList.add("loading");
+
+
+                if (message) {
+
+                    message.textContent =
+                        "Signing in...";
+
+                    message.className =
+                        "auth-message";
+
+                }
+
+
+                const provider =
+                    new GoogleAuthProvider();
+
+
+                // Optional but useful:
+                // Always ask Google to show account selection.
+                provider.setCustomParameters({
+                    prompt: "select_account"
+                });
+
+
+                await signInWithPopup(
+                    auth,
+                    provider
+                );
+
+
+                /*
+                 * Authentication succeeded.
+                 *
+                 * onAuthStateChanged()
+                 * handles the redirect.
+                 */
+
+            } catch (error) {
+
+                console.error(
+                    "Google sign-in failed:",
+                    error
+                );
+
+
+                if (message) {
+
+                    message.textContent =
+                        getAuthErrorMessage(
+                            error
+                        );
+
+                    message.className =
+                        "auth-message error";
+
+                }
+
+
+                button.disabled = false;
+
+                button.classList.remove(
+                    "loading"
+                );
+
             }
-        );
+
+        }
+    );
 
 }
 
 
 /* ========================================
-   USER GREETING
+   AUTH ERROR MESSAGE
 ======================================== */
 
-const greetingElement =
-    document.querySelector("#home-greeting");
+function getAuthErrorMessage(error) {
+
+    switch (error.code) {
+
+        case "auth/popup-closed-by-user":
+
+            return "Sign-in was cancelled.";
 
 
-onAuthStateChanged(
-    auth,
-    user => {
+        case "auth/popup-blocked":
 
-        if (
-            !greetingElement ||
-            !user
-        ) {
-
-            return;
-
-        }
+            return "Your browser blocked the sign-in popup. Please allow popups for this site.";
 
 
-        const name =
-            user.displayName ||
-            "there";
+        case "auth/cancelled-popup-request":
+
+            return "Another sign-in popup is already open.";
 
 
-        greetingElement.textContent =
-            `Welcome back, ${name}.`;
+        case "auth/account-exists-with-different-credential":
+
+            return "An account already exists with a different sign-in method.";
+
+
+        case "auth/unauthorized-domain":
+
+            return "This website domain is not authorized in Firebase. Add it in Firebase Authentication → Settings → Authorized domains.";
+
+
+        case "auth/network-request-failed":
+
+            return "Network error. Please check your internet connection.";
+
+
+        case "auth/operation-not-allowed":
+
+            return "Google Sign-In is not enabled in Firebase Authentication.";
+
+
+        case "auth/invalid-api-key":
+
+            return "Firebase configuration is invalid. Check your Firebase API key.";
+
+
+        case "auth/app-not-authorized":
+
+            return "This app is not authorized to use Firebase Authentication.";
+
+
+        default:
+
+            return error.message ||
+                "Unable to sign in. Please try again.";
 
     }
-);
+
+}
 
 
 /* ========================================
-   FURNACE STATS
+   NAVBAR AUTH UI
 ======================================== */
 
-async function loadFurnaceStats() {
+function setupAuthUI() {
 
-    const streakElement =
-        document.querySelector("#home-streak");
+    const profileButton =
+        document.querySelector("#profile-button");
 
-    const smolderElement =
-        document.querySelector("#home-smolders");
 
+    if (!profileButton) return;
+
+
+    /*
+     * Prevent registering multiple listeners
+     * if componentsLoaded fires more than once.
+     */
 
     if (
-        !streakElement &&
-        !smolderElement
+        profileButton.dataset.authInitialized ===
+        "true"
     ) {
-
         return;
-
     }
 
 
-    try {
-
-        await openDatabase();
-
-
-        const stats =
-            await getCurrentCoalStats();
+    profileButton.dataset.authInitialized =
+        "true";
 
 
-        if (streakElement) {
+    onAuthStateChanged(
+        auth,
+        user => {
 
-            streakElement.textContent =
-                stats.streak;
+            if (user) {
+
+                /* ================================
+                   LOGGED IN
+                ================================= */
+
+                const firstName =
+                    user.displayName
+                        ? user.displayName
+                            .trim()
+                            .split(/\s+/)[0]
+                        : "Account";
+
+
+                profileButton.textContent =
+                    firstName;
+
+
+                profileButton.classList.add(
+                    "authenticated"
+                );
+
+
+                profileButton.onclick =
+                    async () => {
+
+                        const confirmed =
+                            window.confirm(
+                                "Sign out?"
+                            );
+
+
+                        if (!confirmed) return;
+
+
+                        try {
+
+                            await signOut(auth);
+
+
+                            /*
+                             * Firebase auth state
+                             * listener will update
+                             * the navbar automatically.
+                             */
+
+                        } catch (error) {
+
+                            console.error(
+                                "Sign out failed:",
+                                error
+                            );
+
+                        }
+
+                    };
+
+
+            } else {
+
+                /* ================================
+                   LOGGED OUT
+                ================================= */
+
+                profileButton.textContent =
+                    "Sign In";
+
+
+                profileButton.classList.remove(
+                    "authenticated"
+                );
+
+
+                profileButton.onclick =
+                    () => {
+
+                        window.location.href =
+                            "auth.html";
+
+                    };
+
+            }
 
         }
-
-
-        if (smolderElement) {
-
-            smolderElement.textContent =
-                stats.smolders;
-
-        }
-
-
-    } catch (error) {
-
-        console.error(
-            "Failed to load Furnace stats:",
-            error
-        );
-
-    }
+    );
 
 }
 
 
 /* ========================================
-   INITIALIZE
+   INITIALIZE GOOGLE SIGN IN
 ======================================== */
 
-loadFurnaceStats();
+setupGoogleSignIn();
 
 
 /* ========================================
-   REFRESH WHEN FURNACE CHANGES
+   WAIT FOR NAVBAR
 ======================================== */
 
 window.addEventListener(
-    "journal-updated",
-    loadFurnaceStats
-);
-
-
-window.addEventListener(
-    "coal-updated",
-    loadFurnaceStats
-);
-
-
-window.addEventListener(
-    "online",
-    loadFurnaceStats
+    "componentsLoaded",
+    setupAuthUI
 );

@@ -1,0 +1,179 @@
+/* ========================================
+   AUTH PAGE
+======================================== */
+
+.auth-page {
+    min-height: calc(100vh - 140px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 40px 20px;
+}
+
+
+/* ========================================
+   AUTH CONTAINER
+======================================== */
+
+.auth-container {
+    width: 100%;
+    max-width: 420px;
+
+    padding: 40px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+
+    box-shadow:
+        0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+
+/* ========================================
+   AUTH HEADER
+======================================== */
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.auth-header h1 {
+    margin: 0 0 10px;
+
+    color: var(--text);
+
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.auth-header p {
+    margin: 0;
+
+    color: var(--text-muted);
+
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+
+/* ========================================
+   GOOGLE SIGN-IN BUTTON
+======================================== */
+
+.google-button {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    padding: 13px 18px;
+
+    background: var(--surface);
+    color: var(--text);
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+.google-button:hover {
+    background: var(--background);
+
+    border-color: #CBD5E1;
+
+    box-shadow:
+        0 4px 12px rgba(15, 23, 42, 0.08);
+
+    transform: translateY(-1px);
+}
+
+.google-button:active {
+    transform: translateY(0);
+}
+
+.google-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+
+/* ========================================
+   GOOGLE ICON
+======================================== */
+
+.google-button i {
+    font-size: 18px;
+}
+
+
+/* ========================================
+   AUTH MESSAGE
+======================================== */
+
+.auth-message {
+    min-height: 22px;
+
+    margin: 18px 0 0;
+
+    color: var(--text-muted);
+
+    font-size: 14px;
+    line-height: 1.5;
+
+    text-align: center;
+}
+
+.auth-message.error {
+    color: #DC2626;
+}
+
+
+/* ========================================
+   MOBILE
+======================================== */
+
+@media (max-width: 600px) {
+
+    .auth-page {
+        min-height: calc(100vh - 100px);
+
+        padding: 24px 16px;
+    }
+
+    .auth-container {
+        padding: 30px 22px;
+    }
+
+    .auth-header h1 {
+        font-size: 26px;
+    }
+
+    .auth-header p {
+        font-size: 14px;
+    }
+
+    .google-button {
+        padding: 12px 16px;
+    }
+}
