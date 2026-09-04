@@ -8,6 +8,16 @@
 
 
 /* ========================================
+   HOME CONTAINER
+======================================== */
+
+.home-main .page-container {
+    width: min(94%, 1500px);
+    max-width: 1500px;
+}
+
+
+/* ========================================
    HEADER
 ======================================== */
 
@@ -48,22 +58,88 @@
 .os-dashboard {
     display: grid;
 
+    /*
+       LEFT ≈ 70%
+       RIGHT ≈ 30%
+    */
+
     grid-template-columns:
-        minmax(0, 2.15fr) minmax(280px, 1fr);
+        minmax(0, 2.25fr) minmax(320px, 1fr);
 
-    gap: 20px;
+    gap: 24px;
 
-    align-items: stretch;
+    align-items: start;
 }
 
 
 /* ========================================
-   GENERIC WIDGET
+   LEFT MODULE AREA
 ======================================== */
 
-.widget {
+.home-left {
+    min-width: 0;
+
+    display: grid;
+
+    /*
+       Future modules automatically form
+       a two-column grid underneath
+       the full-width Latest Script.
+    */
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 24px;
+
+    align-content: start;
+}
+
+
+/* ========================================
+   RIGHT MODULE AREA
+======================================== */
+
+.home-right {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 24px;
+}
+
+
+/* ========================================
+   GENERIC HOME WIDGET
+======================================== */
+
+.home-widget {
+    min-width: 0;
+
+    box-sizing: border-box;
+
     text-decoration: none;
     color: inherit;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-radius: 20px;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.home-widget:hover {
+    transform: translateY(-2px);
+
+    border-color: #CBD5E1;
+
+    box-shadow:
+        0 12px 30px rgba(15, 23, 42, 0.08);
 }
 
 
@@ -72,31 +148,24 @@
 ======================================== */
 
 .latest-note-widget {
+    /*
+       Keep Latest Script large.
+       Future modules will be placed
+       underneath it.
+    */
+
     min-height: 560px;
 
     padding: 28px;
 
-    border: 1px solid var(--border);
-    border-radius: 20px;
-
-    background: var(--surface);
-
     display: flex;
     flex-direction: column;
 
-    transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease,
-        border-color 0.2s ease;
-}
+    /*
+       Always use the entire left column.
+    */
 
-.latest-note-widget:hover {
-    transform: translateY(-2px);
-
-    border-color: #CBD5E1;
-
-    box-shadow:
-        0 12px 30px rgba(15, 23, 42, 0.08);
+    grid-column: 1 / -1;
 }
 
 
@@ -148,7 +217,7 @@
     display: flex;
     align-items: center;
 
-    padding: 36px 0;
+    padding: 30px 0;
 }
 
 .latest-note-content p {
@@ -200,31 +269,84 @@
 
 
 /* ========================================
-   HOME COAL SIDEBAR
+   FUTURE MODULE COMPATIBILITY
 ======================================== */
 
 /*
-   The actual Coal styling comes from
-   journal.css.
+   Do NOT add empty/dummy widgets.
 
-   These rules only adapt that sidebar
-   to the home dashboard.
+   When a real module is created later,
+   give it the "home-widget" class and
+   it will automatically occupy one of
+   these two columns.
+
+   Example:
+
+   <a class="home-widget">
+       ...
+   </a>
 */
+
+.home-left>.home-widget:not(.latest-note-widget) {
+    min-height: 260px;
+
+    padding: 24px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* ========================================
+   HOME COAL
+======================================== */
 
 .home-main .journal-sidebar {
     position: static;
 
     width: 100%;
-    height: 100%;
 }
 
 .home-main .journal-sidebar-card {
-    height: 100%;
+    /*
+       Match the height of Latest Script.
+    */
+
+    height: 560px;
 
     box-sizing: border-box;
 
     display: flex;
     flex-direction: column;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.home-main .journal-sidebar-card:hover {
+    transform: translateY(-2px);
+
+    border-color: #CBD5E1;
+
+    box-shadow:
+        0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+
+/* ========================================
+   CALENDAR NAVIGATION
+======================================== */
+
+.home-main .calendar-nav {
+    cursor: pointer;
+}
+
+.home-main .calendar-nav:hover {
+    transform: none;
 }
 
 
@@ -234,7 +356,9 @@
 
 .home-main .coal-month-progress {
     margin-top: 20px;
+
     padding-top: 16px;
+
     border-top: 1px solid var(--border);
 }
 
@@ -242,68 +366,118 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+
     gap: 10px;
+
     margin-bottom: 9px;
 }
 
 #coal-progress-label {
     color: var(--text-muted);
+
     font-size: 15px;
     font-weight: 400;
 }
 
 #coal-progress-value {
     color: var(--navy);
+
     font-size: 15px;
     font-weight: 700;
+
     white-space: nowrap;
 }
 
 .coal-progress-track {
     width: 100%;
     height: 10px;
+
     overflow: hidden;
+
     border-radius: 999px;
+
     background: var(--background);
 }
 
 .coal-progress-bar {
     width: 0%;
     height: 100%;
+
     border-radius: inherit;
+
     background: var(--navy);
+
     transition: width 0.3s ease;
 }
 
+
+/* ========================================
+   STREAK
+======================================== */
+
 .home-main .journal-sidebar-value {
     margin-top: auto;
+
     font-size: 18px;
     font-weight: 700;
 }
 
 
 /* ========================================
-   COAL CARD HOVER
+   TABLET
 ======================================== */
 
-/*
-   The Coal card itself isn't a link,
-   so we don't add the widget hover effect.
-*/
+@media (max-width: 1100px) {
+
+    .home-main .page-container {
+        width: 92%;
+    }
+
+    .os-dashboard {
+        grid-template-columns:
+            minmax(0, 2fr) minmax(280px, 1fr);
+    }
+
+}
+
+
+/* ========================================
+   SMALL TABLET
+======================================== */
+
+@media (max-width: 850px) {
+
+    .home-left {
+        grid-template-columns: 1fr;
+    }
+
+}
 
 
 /* ========================================
    MOBILE
 ======================================== */
 
-@media (max-width: 900px) {
+@media (max-width: 700px) {
 
     .os-dashboard {
         grid-template-columns: 1fr;
+
+        gap: 24px;
+    }
+
+    .home-left {
+        grid-template-columns: 1fr;
+    }
+
+    .home-right {
+        height: auto;
     }
 
     .latest-note-widget {
         min-height: 400px;
+
+        grid-column: auto;
     }
 
     .home-main .journal-sidebar {
@@ -317,8 +491,13 @@
     .home-main .journal-sidebar-value {
         margin-top: 0;
     }
+
 }
 
+
+/* ========================================
+   SMALL MOBILE
+======================================== */
 
 @media (max-width: 600px) {
 
@@ -326,8 +505,9 @@
         padding-top: 20px;
     }
 
-
-    /* HEADER */
+    .home-main .page-container {
+        width: 92%;
+    }
 
     .os-header {
         align-items: flex-start;
@@ -350,9 +530,6 @@
     .os-date {
         font-size: 13px;
     }
-
-
-    /* LATEST SCRIPT */
 
     .latest-note-widget {
         min-height: 360px;
@@ -381,11 +558,9 @@
         gap: 10px;
     }
 
-
-    /* COAL */
-
     .home-main .journal-sidebar-card {
         padding: 20px;
     }
 
 }
+

@@ -13,12 +13,13 @@ import {
 import {
     openDatabase,
     getEntries,
-    getScripts,
-    getCoalData
+    getCoalData,
+    getScripts
 } from "./db.js";
 
 import {
-    getCurrentCoalStats
+    getCurrentCoalStats,
+    getCalendarDate
 } from "./coal.js";
 
 
@@ -62,23 +63,6 @@ const smolderElement =
 
 
 /* ========================================
-   CALENDAR
-======================================== */
-
-const calendarMonth =
-    document.querySelector("#calendar-month");
-
-const calendarPrev =
-    document.querySelector("#calendar-prev");
-
-const calendarNext =
-    document.querySelector("#calendar-next");
-
-const calendarGrid =
-    document.querySelector("#coal-calendar-grid");
-
-
-/* ========================================
    MONTHLY PROGRESS
 ======================================== */
 
@@ -93,15 +77,6 @@ const progressBar =
 
 
 /* ========================================
-   CALENDAR STATE
-======================================== */
-
-let calendarDate = new Date();
-
-calendarDate.setDate(1);
-
-
-/* ========================================
    DATE
 ======================================== */
 
@@ -110,6 +85,7 @@ function updateDate() {
     if (!dateElement) {
         return;
     }
+
 
     dateElement.textContent =
         new Date().toLocaleDateString(
@@ -135,6 +111,7 @@ function setupGreeting() {
         return;
     }
 
+
     onAuthStateChanged(
         auth,
         user => {
@@ -143,6 +120,7 @@ function setupGreeting() {
                 return;
             }
 
+
             const name =
                 user.displayName
                     ? user.displayName
@@ -150,10 +128,13 @@ function setupGreeting() {
                         .split(/\s+/)[0]
                     : "friend";
 
+
             const hour =
                 new Date().getHours();
 
+
             let greetings;
+
 
             if (
                 hour >= 6 &&
@@ -205,16 +186,18 @@ function setupGreeting() {
 
             }
 
+
             const greeting =
                 greetings[
-                Math.floor(
-                    Math.random() *
-                    greetings.length
-                )
+                    Math.floor(
+                        Math.random() *
+                        greetings.length
+                    )
                 ];
 
+
             greetingElement.textContent =
-                `${greeting}, ${name}.`;
+                `${ greeting }, ${ name }.`;
 
         }
     );
@@ -254,8 +237,10 @@ function formatDate(timestamp) {
         return "";
     }
 
+
     const date =
         new Date(timestamp);
+
 
     if (
         Number.isNaN(
@@ -264,6 +249,7 @@ function formatDate(timestamp) {
     ) {
         return "";
     }
+
 
     return date.toLocaleDateString(
         undefined,
@@ -290,8 +276,10 @@ function getPlainTextPreview(
     const temp =
         document.createElement("div");
 
+
     temp.innerHTML =
         content || "";
+
 
     const text =
         (
@@ -302,9 +290,11 @@ function getPlainTextPreview(
             .replace(/\s+/g, " ")
             .trim();
 
+
     if (!text) {
         return "This Script is empty.";
     }
+
 
     if (
         text.length <= maxLength
@@ -312,10 +302,12 @@ function getPlainTextPreview(
         return text;
     }
 
+
     return (
-        text
-            .slice(0, maxLength)
-            .trim() +
+        text.slice(
+            0,
+            maxLength
+        ).trim() +
         "…"
     );
 
@@ -336,10 +328,12 @@ async function loadLatestScript() {
         return;
     }
 
+
     try {
 
         const scripts =
             await getScripts();
+
 
         if (
             !scripts ||
@@ -353,12 +347,14 @@ async function loadLatestScript() {
 
             }
 
+
             if (latestNotePreview) {
 
                 latestNotePreview.textContent =
                     "Your latest Script will appear here.";
 
             }
+
 
             if (latestNoteDate) {
 
@@ -367,19 +363,32 @@ async function loadLatestScript() {
 
             }
 
+
+            if (latestNoteWidget) {
+
+                latestNoteWidget.href =
+                    "codes.html";
+
+            }
+
+
             return;
+
         }
+
 
         const latestScript =
             scripts[0];
 
+
         if (latestNoteTitle) {
 
             latestNoteTitle.textContent =
-                latestScript.title?.trim()
-                || "Untitled Script";
+                latestScript.title?.trim() ||
+                "Untitled Script";
 
         }
+
 
         if (latestNotePreview) {
 
@@ -390,6 +399,7 @@ async function loadLatestScript() {
 
         }
 
+
         if (latestNoteDate) {
 
             latestNoteDate.textContent =
@@ -399,6 +409,7 @@ async function loadLatestScript() {
                 );
 
         }
+
 
         if (latestNoteWidget) {
 
@@ -430,12 +441,14 @@ async function loadCoalStats() {
         const stats =
             await getCurrentCoalStats();
 
+
         if (streakElement) {
 
             streakElement.textContent =
                 stats?.streak ?? 0;
 
         }
+
 
         if (smolderElement) {
 
@@ -457,7 +470,7 @@ async function loadCoalStats() {
 
 
 /* ========================================
-   GET JOURNAL ENTRY DATES
+   GET ENTRY DATES
 ======================================== */
 
 function getEntryDates(entries) {
@@ -465,9 +478,11 @@ function getEntryDates(entries) {
     const dates =
         new Set();
 
+
     if (!Array.isArray(entries)) {
         return dates;
     }
+
 
     entries.forEach(
         entry => {
@@ -476,10 +491,12 @@ function getEntryDates(entries) {
                 return;
             }
 
+
             const date =
                 new Date(
                     entry.createdAt
                 );
+
 
             if (
                 Number.isNaN(
@@ -489,6 +506,7 @@ function getEntryDates(entries) {
                 return;
             }
 
+
             dates.add(
                 getDateKey(date)
             );
@@ -496,52 +514,8 @@ function getEntryDates(entries) {
         }
     );
 
+
     return dates;
-
-}
-
-
-/* ========================================
-   GET PROTECTED DATES
-======================================== */
-
-async function getProtectedDates() {
-
-    try {
-
-        const coalData =
-            await getCoalData();
-
-        if (
-            Array.isArray(
-                coalData?.protectedDates
-            )
-        ) {
-
-            return new Set(
-                coalData.protectedDates
-            );
-
-        }
-
-    } catch (error) {
-
-        /*
-           Protected dates are optional for
-           calendar rendering.
-
-           If this fails, the calendar
-           should STILL render normally.
-        */
-
-        console.warn(
-            "Could not load protected Coal dates:",
-            error
-        );
-
-    }
-
-    return new Set();
 
 }
 
@@ -550,12 +524,7 @@ async function getProtectedDates() {
    UPDATE MONTHLY PROGRESS
 ======================================== */
 
-function updateMonthlyProgress(
-    entryDates,
-    year,
-    month,
-    daysInMonth
-) {
+async function updateMonthlyProgress() {
 
     if (
         !progressLabel &&
@@ -565,120 +534,25 @@ function updateMonthlyProgress(
         return;
     }
 
-    const monthName =
-        new Date(
-            year,
-            month,
-            1
-        ).toLocaleDateString(
-            undefined,
-            {
-                month: "long"
-            }
-        );
-
-    let activeDays = 0;
-
-    for (
-        let day = 1;
-        day <= daysInMonth;
-        day++
-    ) {
-
-        const date =
-            new Date(
-                year,
-                month,
-                day
-            );
-
-        if (
-            entryDates.has(
-                getDateKey(date)
-            )
-        ) {
-
-            activeDays++;
-
-        }
-
-    }
-
-    const percentage =
-        daysInMonth > 0
-            ? (
-                activeDays /
-                daysInMonth
-            ) * 100
-            : 0;
-
-    if (progressLabel) {
-
-        progressLabel.textContent =
-            `${monthName} progress`;
-
-    }
-
-    if (progressValue) {
-
-        progressValue.textContent =
-            `${activeDays} / ${daysInMonth} days`;
-
-    }
-
-    if (progressBar) {
-
-        progressBar.style.width =
-            `${Math.min(
-                100,
-                percentage
-            )}%`;
-
-    }
-
-}
-
-
-/* ========================================
-   RENDER HOME CALENDAR
-======================================== */
-
-async function renderHomeCalendar() {
-
-    if (!calendarGrid) {
-        return;
-    }
 
     try {
 
-        /*
-           Get journal entries first.
-
-           The calendar itself depends on
-           this data, not on Coal data.
-        */
-
         const entries =
             await getEntries();
+
 
         const entryDates =
             getEntryDates(entries);
 
 
         /*
-           Protected dates are optional.
-
-           If loading them fails, the
-           calendar will still render.
+           Get the SAME calendar month
+           currently being displayed by Coal.
         */
 
-        const protectedDates =
-            await getProtectedDates();
+        const calendarDate =
+            getCalendarDate();
 
-
-        /* ====================================
-           CURRENT MONTH
-        ==================================== */
 
         const year =
             calendarDate.getFullYear();
@@ -686,28 +560,6 @@ async function renderHomeCalendar() {
         const month =
             calendarDate.getMonth();
 
-
-        /* ====================================
-           MONTH TITLE
-        ==================================== */
-
-        if (calendarMonth) {
-
-            calendarMonth.textContent =
-                calendarDate.toLocaleDateString(
-                    undefined,
-                    {
-                        month: "long",
-                        year: "numeric"
-                    }
-                );
-
-        }
-
-
-        /* ====================================
-           DAYS IN MONTH
-        ==================================== */
 
         const daysInMonth =
             new Date(
@@ -717,86 +569,17 @@ async function renderHomeCalendar() {
             ).getDate();
 
 
-        /* ====================================
-           MONTHLY PROGRESS
-        ==================================== */
-
-        updateMonthlyProgress(
-            entryDates,
-            year,
-            month,
-            daysInMonth
-        );
-
-
-        /* ====================================
-           MONDAY-FIRST OFFSET
-        ==================================== */
-
-        const firstDay =
-            new Date(
-                year,
-                month,
-                1
+        const monthName =
+            calendarDate.toLocaleDateString(
+                undefined,
+                {
+                    month: "long"
+                }
             );
 
-        const startingDay =
-            (
-                firstDay.getDay() +
-                6
-            ) % 7;
 
+        let activeDays = 0;
 
-        /* ====================================
-           TODAY
-        ==================================== */
-
-        const today =
-            new Date();
-
-        today.setHours(
-            0,
-            0,
-            0,
-            0
-        );
-
-
-        /* ====================================
-           CLEAR CALENDAR
-        ==================================== */
-
-        calendarGrid.innerHTML = "";
-
-
-        /* ====================================
-           EMPTY CELLS
-        ==================================== */
-
-        for (
-            let i = 0;
-            i < startingDay;
-            i++
-        ) {
-
-            const emptyDay =
-                document.createElement(
-                    "div"
-                );
-
-            emptyDay.className =
-                "calendar-day empty";
-
-            calendarGrid.appendChild(
-                emptyDay
-            );
-
-        }
-
-
-        /* ====================================
-           CALENDAR DAYS
-        ==================================== */
 
         for (
             let day = 1;
@@ -811,179 +594,100 @@ async function renderHomeCalendar() {
                     day
                 );
 
-            date.setHours(
-                0,
-                0,
-                0,
-                0
-            );
 
-            const dateKey =
-                getDateKey(date);
-
-            const hasEntry =
+            if (
                 entryDates.has(
-                    dateKey
-                );
+                    getDateKey(date)
+                )
+            ) {
 
-            const isProtected =
-                protectedDates.has(
-                    dateKey
-                );
-
-            const isToday =
-                date.getTime() ===
-                today.getTime();
-
-            const isFuture =
-                date > today;
-
-
-            /* ==================================
-               DAY ELEMENT
-            ================================== */
-
-            const dayElement =
-                document.createElement(
-                    "div"
-                );
-
-            dayElement.className =
-                "calendar-day";
-
-
-            /* ==================================
-               STATE
-            ================================== */
-
-            if (isFuture) {
-
-                dayElement.classList.add(
-                    "future"
-                );
-
-            } else if (hasEntry) {
-
-                dayElement.classList.add(
-                    "fuel"
-                );
-
-            } else if (isProtected) {
-
-                dayElement.classList.add(
-                    "protected"
-                );
-
-            } else if (isToday) {
-
-                dayElement.classList.add(
-                    "today"
-                );
-
-            } else {
-
-                dayElement.classList.add(
-                    "cold"
-                );
+                activeDays++;
 
             }
 
-
-            /* ==================================
-               DAY NUMBER
-            ================================== */
-
-            const numberElement =
-                document.createElement(
-                    "span"
-                );
-
-            numberElement.className =
-                "calendar-day-number";
-
-            numberElement.textContent =
-                day;
+        }
 
 
-            dayElement.appendChild(
-                numberElement
-            );
+        const percentage =
+            daysInMonth > 0
+                ? (
+                    activeDays /
+                    daysInMonth
+                ) * 100
+                : 0;
 
 
-            calendarGrid.appendChild(
-                dayElement
-            );
+        if (progressLabel) {
+
+            progressLabel.textContent =
+                `${ monthName } progress`;
 
         }
 
+
+        if (progressValue) {
+
+            progressValue.textContent =
+                `${ activeDays } / ${daysInMonth} days`;
+
+        }
+
+
+if (progressBar) {
+
+    progressBar.style.width =
+        `${Math.min(
+            100,
+            percentage
+        )}%`;
+
+}
 
     } catch (error) {
 
-        console.error(
-            "Failed to render Home calendar:",
-            error
-        );
+    console.error(
+        "Failed to update monthly Coal progress:",
+        error
+    );
 
-        /*
-           Don't leave the calendar looking
-           completely broken if something
-           unexpected happens.
-        */
-
-        if (calendarGrid.children.length === 0) {
-
-            calendarGrid.innerHTML = `
-                <div
-                    style="
-                        grid-column: 1 / -1;
-                        text-align: center;
-                        color: var(--text-muted);
-                        font-size: 12px;
-                        padding: 10px 0;
-                    "
-                >
-                    Calendar unavailable
-                </div>
-            `;
-
-        }
-
-    }
+}
 
 }
 
 
 /* ========================================
-   PREVIOUS MONTH
+   COAL CARD NAVIGATION
 ======================================== */
 
-calendarPrev?.addEventListener(
+const coalCard =
+    document.querySelector(
+        "#home-coal-card"
+    );
+
+
+coalCard?.addEventListener(
     "click",
-    () => {
+    event => {
 
-        calendarDate.setMonth(
-            calendarDate.getMonth() - 1
-        );
+        /*
+           Calendar navigation buttons
+           belong to Coal.
 
-        renderHomeCalendar();
+           Do not navigate to Journal
+           when they are clicked.
+        */
 
-    }
-);
+        if (
+            event.target.closest(
+                ".calendar-nav"
+            )
+        ) {
+            return;
+        }
 
 
-/* ========================================
-   NEXT MONTH
-======================================== */
-
-calendarNext?.addEventListener(
-    "click",
-    () => {
-
-        calendarDate.setMonth(
-            calendarDate.getMonth() + 1
-        );
-
-        renderHomeCalendar();
+        window.location.href =
+            "journal.html";
 
     }
 );
@@ -999,14 +703,16 @@ async function initializeHome() {
 
     setupGreeting();
 
+
     try {
 
         await openDatabase();
 
+
         await Promise.all([
             loadLatestScript(),
             loadCoalStats(),
-            renderHomeCalendar()
+            updateMonthlyProgress()
         ]);
 
     } catch (error) {
@@ -1033,8 +739,7 @@ window.addEventListener(
     () => {
 
         loadCoalStats();
-
-        renderHomeCalendar();
+        updateMonthlyProgress();
 
     }
 );
@@ -1077,8 +782,21 @@ window.addEventListener(
     () => {
 
         loadCoalStats();
+        updateMonthlyProgress();
 
-        renderHomeCalendar();
+    }
+);
+
+
+/* ========================================
+   COAL CALENDAR UPDATED
+======================================== */
+
+window.addEventListener(
+    "coal-calendar-updated",
+    () => {
+
+        updateMonthlyProgress();
 
     }
 );
@@ -1096,10 +814,8 @@ window.addEventListener(
             () => {
 
                 loadLatestScript();
-
                 loadCoalStats();
-
-                renderHomeCalendar();
+                updateMonthlyProgress();
 
             },
             1000
@@ -1123,10 +839,8 @@ document.addEventListener(
         ) {
 
             loadLatestScript();
-
             loadCoalStats();
-
-            renderHomeCalendar();
+            updateMonthlyProgress();
 
         }
 

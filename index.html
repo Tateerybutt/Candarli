@@ -13,11 +13,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="icon" type="image/x-icon" href="assets/favicon/favicon.ico">
-
     <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
-
     <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
-
     <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png">
 
     <link rel="manifest" href="site.webmanifest">
@@ -28,21 +25,10 @@
 
 </head>
 
-
 <body data-page="home">
-
-
-    <!-- ========================================
-         NAVBAR
-    ========================================= -->
 
     <div id="navbar"></div>
 
-
-
-    <!-- ========================================
-         MAIN
-    ========================================= -->
 
     <main class="main home-main">
 
@@ -50,8 +36,8 @@
 
 
             <!-- ========================================
-                 HEADER
-            ========================================= -->
+                 HOME HEADER
+            ======================================== -->
 
             <section class="os-header">
 
@@ -67,221 +53,228 @@
 
                 </div>
 
-
-                <div class="os-date" id="os-date">
-                </div>
+                <div class="os-date" id="os-date"></div>
 
             </section>
 
 
-
             <!-- ========================================
-                 DASHBOARD
-            ========================================= -->
-
-            <!-- ========================================
-                 DASHBOARD
+                 HOME DASHBOARD
             ======================================== -->
 
             <section class="os-dashboard">
 
 
                 <!-- ====================================
-                     LATEST SCRIPT
-                ===================================== -->
+                     LEFT MODULE AREA
+                ==================================== -->
 
-                <a href="code.html" class="widget latest-note-widget" id="latest-note-widget">
+                <div class="home-left">
 
-                    <div class="latest-note-header">
 
-                        <div>
+                    <!-- ==================================
+                         LATEST SCRIPT
+                    ================================== -->
 
-                            <span class="widget-label">
-                                Latest Script
-                            </span>
+                    <a href="codes.html" class="home-widget latest-note-widget" id="latest-note-widget">
 
-                            <h2 id="latest-note-title">
-                                Your latest script
-                            </h2>
+                        <div class="latest-note-header">
+
+                            <div>
+
+                                <span class="widget-label">
+                                    Latest Script
+                                </span>
+
+                                <h2 id="latest-note-title">
+                                    Your latest script
+                                </h2>
+
+                            </div>
+
+                            <i class="fa-solid fa-arrow-up-right-from-square widget-arrow"></i>
 
                         </div>
 
-                        <i class="fa-solid fa-arrow-up-right-from-square widget-arrow"></i>
 
-                    </div>
+                        <div class="latest-note-content">
 
+                            <p id="latest-note-preview">
+                                Your latest script will appear here.
+                            </p>
 
-                    <div class="latest-note-content">
-
-                        <p id="latest-note-preview">
-                            Your latest script will appear here.
-                        </p>
-
-                    </div>
+                        </div>
 
 
-                    <div class="latest-note-footer">
+                        <div class="latest-note-footer">
 
-                        <span id="latest-note-date">
-                            No scripts yet
-                        </span>
+                            <span id="latest-note-date">
+                                No scripts yet
+                            </span>
 
-                        <span class="latest-note-open">
+                            <span class="latest-note-open">
 
-                            Open Scripts
+                                Open Scripts
 
-                            <i class="fa-solid fa-arrow-right"></i>
+                                <i class="fa-solid fa-arrow-right"></i>
 
-                        </span>
+                            </span>
 
-                    </div>
+                        </div>
 
-                </a>
+                    </a>
 
+
+                </div>
 
 
                 <!-- ====================================
-                     COAL SIDEBAR
-                ===================================== -->
+                     RIGHT MODULE AREA
+                ==================================== -->
 
-                <aside class="journal-sidebar">
-
-                    <div class="journal-sidebar-card">
+                <aside class="home-right">
 
 
-                        <!-- COAL TITLE -->
+                    <!-- ==================================
+                         COAL
+                    ================================== -->
 
-                        <h2 class="journal-sidebar-title">
+                    <div class="journal-sidebar">
 
-                            <img src="assets/icons/coal.png" alt="" class="coal-icon">
+                        <div class="journal-sidebar-card" id="home-coal-card">
 
-                            Coal
+                            <h2 class="journal-sidebar-title">
 
-                        </h2>
+                                <img src="assets/icons/coal.png" alt="" class="coal-icon">
 
+                                Coal
 
-                        <p class="journal-sidebar-subtitle">
-                            Devam et.
-                        </p>
-
-
-
-                        <!-- =================================
-                             COAL CALENDAR
-                        ================================== -->
-
-                        <div class="coal-calendar">
-
-                            <div class="coal-calendar-header">
-
-                                <button id="calendar-prev" class="calendar-nav" type="button"
-                                    aria-label="Previous month">
-
-                                    <i class="fa-solid fa-chevron-left"></i>
-
-                                </button>
+                            </h2>
 
 
-                                <span id="calendar-month"></span>
+                            <p class="journal-sidebar-subtitle">
+                                Devam et.
+                            </p>
 
 
-                                <button id="calendar-next" class="calendar-nav" type="button" aria-label="Next month">
+                            <!-- ==========================
+                                 CALENDAR
+                            =========================== -->
 
-                                    <i class="fa-solid fa-chevron-right"></i>
+                            <div class="coal-calendar">
 
-                                </button>
+                                <div class="coal-calendar-header">
+
+                                    <button id="calendar-prev" class="calendar-nav" type="button"
+                                        aria-label="Previous month">
+
+                                        <i class="fa-solid fa-chevron-left"></i>
+
+                                    </button>
+
+
+                                    <span id="calendar-month"></span>
+
+
+                                    <button id="calendar-next" class="calendar-nav" type="button"
+                                        aria-label="Next month">
+
+                                        <i class="fa-solid fa-chevron-right"></i>
+
+                                    </button>
+
+                                </div>
+
+
+                                <div class="calendar-weekdays">
+
+                                    <span>M</span>
+                                    <span>T</span>
+                                    <span>W</span>
+                                    <span>T</span>
+                                    <span>F</span>
+                                    <span>S</span>
+                                    <span>S</span>
+
+                                </div>
+
+
+                                <div id="coal-calendar-grid" class="coal-calendar-grid"></div>
+
+                            </div>
+
+
+                            <!-- ==========================
+                                 MONTHLY PROGRESS
+                            =========================== -->
+
+                            <div class="coal-month-progress">
+
+                                <div class="coal-month-progress-header">
+
+                                    <span id="coal-progress-label">
+                                        September progress
+                                    </span>
+
+                                    <span id="coal-progress-value">
+                                        0 / 30 days
+                                    </span>
+
+                                </div>
+
+
+                                <div class="coal-progress-track">
+
+                                    <div id="coal-progress-bar" class="coal-progress-bar"></div>
+
+                                </div>
 
                             </div>
 
 
-                            <!-- MONDAY FIRST -->
+                            <!-- ==========================
+                                 STREAK
+                            =========================== -->
 
-                            <div class="calendar-weekdays">
+                            <div class="journal-sidebar-value">
 
-                                <span>M</span>
-                                <span>T</span>
-                                <span>W</span>
-                                <span>T</span>
-                                <span>F</span>
-                                <span>S</span>
-                                <span>S</span>
-
-                            </div>
-
-
-                            <div id="coal-calendar-grid" class="coal-calendar-grid">
-                            </div>
-
-                        </div>
-
-                        <!-- =================================
-                 MONTHLY PROGRESS
-            ================================= -->
-
-                        <div class="coal-month-progress">
-
-                            <div class="coal-month-progress-header">
-
-                                <span id="coal-progress-label">
-                                    September progress
-                                </span>
-
-                                <span id="coal-progress-value">
-                                    0 / 30 days
-                                </span>
-
-                            </div>
-
-                            <div class="coal-progress-track">
-
-                                <div id="coal-progress-bar" class="coal-progress-bar"></div>
-
-                            </div>
-
-                        </div>
-
-                        <!-- =================================
-                             STREAK
-                        ================================== -->
-
-                        <div class="journal-sidebar-value">
-
-                            <span id="streak-value">
-                                0
-                            </span>
-
-                            <span id="streak-label">
-                                days
-                            </span>
-
-                        </div>
-
-
-
-                        <!-- =================================
-                             SMOLDERS
-                        ================================== -->
-
-                        <div class="coal-smolders">
-
-                            <img src="assets/icons/coal-ember.png" alt="Smolders" class="smolder-icon">
-
-                            <div class="smolder-info">
-
-                                <span id="smolder-value">
+                                <span id="streak-value">
                                     0
                                 </span>
 
-                                <span id="smolder-label">
-                                    Smolders
+                                <span id="streak-label">
+                                    days
                                 </span>
+
+                            </div>
+
+
+                            <!-- ==========================
+                                 SMOLDERS
+                            =========================== -->
+
+                            <div class="coal-smolders">
+
+                                <img src="assets/icons/coal-ember.png" alt="Smolders" class="smolder-icon">
+
+                                <div class="smolder-info">
+
+                                    <span id="smolder-value">
+                                        0
+                                    </span>
+
+                                    <span id="smolder-label">
+                                        Smolders
+                                    </span>
+
+                                </div>
 
                             </div>
 
                         </div>
 
-
                     </div>
+
 
                 </aside>
 
@@ -292,18 +285,8 @@
     </main>
 
 
-
-    <!-- ========================================
-         FOOTER
-    ========================================= -->
-
     <div id="footer"></div>
 
-
-
-    <!-- ========================================
-         SCRIPTS
-    ========================================= -->
 
     <script type="module" src="./js/component.js"></script>
 

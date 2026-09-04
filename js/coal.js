@@ -57,6 +57,19 @@ calendarDate.setDate(1);
 
 
 /* ========================================
+   GET CALENDAR DATE
+======================================== */
+
+function getCalendarDate() {
+
+    return new Date(
+        calendarDate
+    );
+
+}
+
+
+/* ========================================
    DATE KEY
 ======================================== */
 
@@ -205,32 +218,6 @@ function normalizeCoalData(data) {
 /* ========================================
    CALCULATE STREAK WITH SMOLDERS
 ======================================== */
-
-/*
-   Rules:
-
-   - Today MUST have an entry for the
-     current streak to be active.
-
-   - Today NEVER consumes a Smolder.
-
-   - Missing previous days can consume
-     Smolders.
-
-   Example:
-
-   Day 1  Entry
-   Day 2  Entry
-   Day 3  Missing
-   Day 4  Entry
-
-   Day 3 can be protected by a Smolder.
-
-   Result:
-
-   Streak = 4
-   Smolders = previous - 1
-*/
 
 function calculateStreak(
     entryDates,
@@ -409,9 +396,6 @@ async function processStreakRewards(
     /*
        Milestones from a previous broken
        streak are no longer valid.
-
-       This allows a new 7-day streak to
-       earn another Smolder.
     */
 
     rewardedMilestones =
@@ -424,11 +408,6 @@ async function processStreakRewards(
     /*
        Determine every milestone reached
        by the current streak.
-
-       7  → reward
-       14 → reward
-       21 → reward
-       etc.
     */
 
     const earnedMilestones =
@@ -500,8 +479,7 @@ async function processStreakRewards(
 
 
     /*
-       Sort milestones for clean
-       Firestore data.
+       Sort milestones.
     */
 
     rewardedMilestones.sort(
@@ -510,7 +488,7 @@ async function processStreakRewards(
 
 
     /*
-       Detect changes to streak.
+       Detect streak changes.
     */
 
     if (
@@ -523,7 +501,7 @@ async function processStreakRewards(
 
 
     /*
-       Detect changes to Smolders.
+       Detect Smolder changes.
     */
 
     if (
@@ -536,7 +514,7 @@ async function processStreakRewards(
 
 
     /*
-       Detect changes to protected dates.
+       Detect protected date changes.
     */
 
     const oldProtectedDates =
@@ -596,12 +574,9 @@ async function processStreakRewards(
 
             smolders,
 
-            rewardedMilestones:
-
-                rewardedMilestones,
+            rewardedMilestones,
 
             protectedDates:
-
                 newProtectedDates
 
         });
@@ -616,12 +591,9 @@ async function processStreakRewards(
 
         smolders,
 
-        rewardedMilestones:
-
-            rewardedMilestones,
+        rewardedMilestones,
 
         protectedDates:
-
             newProtectedDates
 
     };
@@ -924,10 +896,6 @@ async function renderCalendar() {
                 "calendar-day";
 
 
-            /* ==================================
-               DATE LABEL
-            ================================== */
-
             const dateLabel =
                 date.toLocaleDateString(
                     undefined,
@@ -983,7 +951,7 @@ async function renderCalendar() {
                     <span class="calendar-tooltip">
                         ${dateLabel}
                         <br>
-                        Fuel Added
+                        Fueled
                     </span>
                 `;
 
@@ -1042,7 +1010,7 @@ async function renderCalendar() {
                     <span class="calendar-tooltip">
                         ${dateLabel}
                         <br>
-                        No fuel added today
+                        Not Fueled today
                     </span>
                 `;
 
@@ -1070,7 +1038,7 @@ async function renderCalendar() {
                     <span class="calendar-tooltip">
                         ${dateLabel}
                         <br>
-                        No fuel added
+                        Not Fueled
                     </span>
                 `;
 
@@ -1082,6 +1050,17 @@ async function renderCalendar() {
             );
 
         }
+
+
+        /* ====================================
+           CALENDAR UPDATED
+        ==================================== */
+
+        window.dispatchEvent(
+            new CustomEvent(
+                "coal-calendar-updated"
+            )
+        );
 
 
     } catch (error) {
@@ -1102,7 +1081,10 @@ async function renderCalendar() {
 
 calendarPrev?.addEventListener(
     "click",
-    () => {
+    event => {
+
+        event.stopPropagation();
+
 
         calendarDate.setMonth(
             calendarDate.getMonth() - 1
@@ -1121,7 +1103,10 @@ calendarPrev?.addEventListener(
 
 calendarNext?.addEventListener(
     "click",
-    () => {
+    event => {
+
+        event.stopPropagation();
+
 
         calendarDate.setMonth(
             calendarDate.getMonth() + 1
@@ -1177,22 +1162,29 @@ async function getCurrentCoalStats() {
     const entries =
         await getEntries();
 
+
     const entryDates =
-        getEntryDates(entries);
+        getEntryDates(
+            entries
+        );
+
 
     const storedCoalData =
         await getCoalData();
+
 
     const coalData =
         normalizeCoalData(
             storedCoalData
         );
 
+
     const streakData =
         calculateStreak(
             entryDates,
             coalData
         );
+
 
     const updatedCoal =
         await processStreakRewards(
@@ -1209,6 +1201,7 @@ async function getCurrentCoalStats() {
             streakData.protectedDates
 
         );
+
 
     return {
 
@@ -1252,6 +1245,12 @@ document.addEventListener(
     initializeCoal
 );
 
+
+/* ========================================
+   EXPORTS
+======================================== */
+
 export {
-    getCurrentCoalStats
+    getCurrentCoalStats,
+    getCalendarDate
 };
