@@ -4,87 +4,309 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Çandarli</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="icon" type="image/x-icon" href="assets/favicon/favicon.ico">
+
     <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
+
     <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
+
     <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png">
+
     <link rel="manifest" href="site.webmanifest">
 
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/journal.css">
+
 </head>
+
 
 <body data-page="home">
 
+
+    <!-- ========================================
+         NAVBAR
+    ========================================= -->
+
     <div id="navbar"></div>
 
+
+
+    <!-- ========================================
+         MAIN
+    ========================================= -->
+
     <main class="main home-main">
+
         <div class="page-container">
 
+
+            <!-- ========================================
+                 HEADER
+            ========================================= -->
+
             <section class="os-header">
+
                 <div>
-                    <h1 id="home-greeting">Welcome back.</h1>
+
+                    <h1 id="home-greeting">
+                        Welcome back.
+                    </h1>
+
                     <p class="os-subtitle">
                         Your personal space, all in one place.
                     </p>
+
                 </div>
 
-                <div class="os-date" id="os-date"></div>
+
+                <div class="os-date" id="os-date">
+                </div>
+
             </section>
+
+
+
+            <!-- ========================================
+                 DASHBOARD
+            ========================================= -->
+
+            <!-- ========================================
+                 DASHBOARD
+            ======================================== -->
 
             <section class="os-dashboard">
 
-                <!-- FURNACE -->
-                <a href="journal.html" class="widget widget-furnace">
 
-                    <div class="widget-furnace-header">
-                        <div class="widget-furnace-title">
-                            <div class="widget-furnace-icon">
-                                <img src="assets/icons/coal.png" alt="Coal">
-                            </div>
+                <!-- ====================================
+                     LATEST SCRIPT
+                ===================================== -->
 
-                            <div>
-                                <h2>Furnace</h2>
-                                <p>Personal Journal</p>
-                            </div>
+                <a href="code.html" class="widget latest-note-widget" id="latest-note-widget">
+
+                    <div class="latest-note-header">
+
+                        <div>
+
+                            <span class="widget-label">
+                                Latest Script
+                            </span>
+
+                            <h2 id="latest-note-title">
+                                Your latest script
+                            </h2>
+
                         </div>
 
                         <i class="fa-solid fa-arrow-up-right-from-square widget-arrow"></i>
+
                     </div>
 
-                    <div class="widget-furnace-main">
-                        <div class="furnace-streak">
-                            <strong id="home-streak">—</strong>
-                            <span>day streak</span>
-                        </div>
 
-                        <div class="furnace-smolders">
-                            <strong id="home-smolders">—</strong>
-                            <span>Smolders</span>
-                        </div>
+                    <div class="latest-note-content">
+
+                        <p id="latest-note-preview">
+                            Your latest script will appear here.
+                        </p>
+
                     </div>
 
-                    <div class="widget-furnace-footer">
-                        <span>Devam et.</span>
-                        <i class="fa-solid fa-arrow-right"></i>
+
+                    <div class="latest-note-footer">
+
+                        <span id="latest-note-date">
+                            No scripts yet
+                        </span>
+
+                        <span class="latest-note-open">
+
+                            Open Scripts
+
+                            <i class="fa-solid fa-arrow-right"></i>
+
+                        </span>
+
                     </div>
 
                 </a>
 
+
+
+                <!-- ====================================
+                     COAL SIDEBAR
+                ===================================== -->
+
+                <aside class="journal-sidebar">
+
+                    <div class="journal-sidebar-card">
+
+
+                        <!-- COAL TITLE -->
+
+                        <h2 class="journal-sidebar-title">
+
+                            <img src="assets/icons/coal.png" alt="" class="coal-icon">
+
+                            Coal
+
+                        </h2>
+
+
+                        <p class="journal-sidebar-subtitle">
+                            Devam et.
+                        </p>
+
+
+
+                        <!-- =================================
+                             COAL CALENDAR
+                        ================================== -->
+
+                        <div class="coal-calendar">
+
+                            <div class="coal-calendar-header">
+
+                                <button id="calendar-prev" class="calendar-nav" type="button"
+                                    aria-label="Previous month">
+
+                                    <i class="fa-solid fa-chevron-left"></i>
+
+                                </button>
+
+
+                                <span id="calendar-month"></span>
+
+
+                                <button id="calendar-next" class="calendar-nav" type="button" aria-label="Next month">
+
+                                    <i class="fa-solid fa-chevron-right"></i>
+
+                                </button>
+
+                            </div>
+
+
+                            <!-- MONDAY FIRST -->
+
+                            <div class="calendar-weekdays">
+
+                                <span>M</span>
+                                <span>T</span>
+                                <span>W</span>
+                                <span>T</span>
+                                <span>F</span>
+                                <span>S</span>
+                                <span>S</span>
+
+                            </div>
+
+
+                            <div id="coal-calendar-grid" class="coal-calendar-grid">
+                            </div>
+
+                        </div>
+
+                        <!-- =================================
+                 MONTHLY PROGRESS
+            ================================= -->
+
+                        <div class="coal-month-progress">
+
+                            <div class="coal-month-progress-header">
+
+                                <span id="coal-progress-label">
+                                    September progress
+                                </span>
+
+                                <span id="coal-progress-value">
+                                    0 / 30 days
+                                </span>
+
+                            </div>
+
+                            <div class="coal-progress-track">
+
+                                <div id="coal-progress-bar" class="coal-progress-bar"></div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- =================================
+                             STREAK
+                        ================================== -->
+
+                        <div class="journal-sidebar-value">
+
+                            <span id="streak-value">
+                                0
+                            </span>
+
+                            <span id="streak-label">
+                                days
+                            </span>
+
+                        </div>
+
+
+
+                        <!-- =================================
+                             SMOLDERS
+                        ================================== -->
+
+                        <div class="coal-smolders">
+
+                            <img src="assets/icons/coal-ember.png" alt="Smolders" class="smolder-icon">
+
+                            <div class="smolder-info">
+
+                                <span id="smolder-value">
+                                    0
+                                </span>
+
+                                <span id="smolder-label">
+                                    Smolders
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                </aside>
+
             </section>
 
         </div>
+
     </main>
+
+
+
+    <!-- ========================================
+         FOOTER
+    ========================================= -->
 
     <div id="footer"></div>
 
+
+
+    <!-- ========================================
+         SCRIPTS
+    ========================================= -->
+
     <script type="module" src="./js/component.js"></script>
+
     <script type="module" src="./js/home.js"></script>
 
 </body>

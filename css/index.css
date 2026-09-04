@@ -1,6 +1,15 @@
+/* ========================================
+   ÇANDARLI OS HOME
+======================================== */
+
 .home-main {
     padding-top: 28px;
 }
+
+
+/* ========================================
+   HEADER
+======================================== */
 
 .os-header {
     display: flex;
@@ -31,177 +40,352 @@
     white-space: nowrap;
 }
 
+
+/* ========================================
+   DASHBOARD
+======================================== */
+
 .os-dashboard {
     display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
+
+    grid-template-columns:
+        minmax(0, 2.15fr) minmax(280px, 1fr);
+
     gap: 20px;
+
+    align-items: stretch;
 }
+
+
+/* ========================================
+   GENERIC WIDGET
+======================================== */
 
 .widget {
     text-decoration: none;
     color: inherit;
 }
 
-.widget-furnace {
-    grid-column: span 6;
-    min-height: 260px;
-    padding: 24px;
+
+/* ========================================
+   LATEST SCRIPT
+======================================== */
+
+.latest-note-widget {
+    min-height: 560px;
+
+    padding: 28px;
+
     border: 1px solid var(--border);
     border-radius: 20px;
+
     background: var(--surface);
+
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
 }
 
-.widget-furnace:hover {
+.latest-note-widget:hover {
     transform: translateY(-2px);
+
     border-color: #CBD5E1;
-    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+
+    box-shadow:
+        0 12px 30px rgba(15, 23, 42, 0.08);
 }
 
-.widget-furnace-header {
+
+/* ========================================
+   LATEST SCRIPT HEADER
+======================================== */
+
+.latest-note-header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 16px;
+
+    gap: 20px;
 }
 
-.widget-furnace-title {
-    display: flex;
-    align-items: center;
-    gap: 14px;
+.widget-label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    color: var(--text-muted);
+
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
 }
 
-.widget-furnace-icon {
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-}
-
-.widget-furnace-icon img {
-    width: 100%;
-    object-fit: contain;
-}
-
-.widget-furnace-title h2 {
+.latest-note-header h2 {
     margin: 0;
-    font-size: 21px;
+
+    font-size: 25px;
     font-weight: 700;
+
     color: var(--text);
+
+    letter-spacing: -0.5px;
 }
 
-.widget-furnace-title p {
-    margin: 2px 0 0;
-    font-size: 13px;
+
+/* ========================================
+   LATEST SCRIPT CONTENT
+======================================== */
+
+.latest-note-content {
+    flex: 1;
+
+    display: flex;
+    align-items: center;
+
+    padding: 36px 0;
+}
+
+.latest-note-content p {
+    max-width: 850px;
+
+    margin: 0;
+
+    font-size: 18px;
+    line-height: 1.8;
+
     color: var(--text-muted);
 }
 
-.widget-arrow {
-    color: #94A3B8;
-    font-size: 14px;
-    transition: transform 0.2s ease, color 0.2s ease;
-}
 
-.widget-furnace:hover .widget-arrow {
-    color: var(--text);
-    transform: translate(2px, -2px);
-}
+/* ========================================
+   LATEST SCRIPT FOOTER
+======================================== */
 
-.widget-furnace-main {
-    display: flex;
-    align-items: flex-end;
-    gap: 48px;
-    padding: 30px 0;
-}
-
-.furnace-streak {
-    display: flex;
-    flex-direction: column;
-}
-
-.furnace-streak strong {
-    font-size: 56px;
-    line-height: 0.95;
-    font-weight: 700;
-    letter-spacing: -2px;
-    color: var(--text);
-}
-
-.furnace-streak span {
-    margin-top: 8px;
-    font-size: 13px;
-    color: var(--text-muted);
-}
-
-.furnace-smolders {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-}
-
-.furnace-smolders span {
-    font-size: 13px;
-    color: var(--text-muted);
-}
-
-.furnace-smolders strong {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--text);
-}
-
-.widget-furnace-footer {
+.latest-note-footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
+
+    gap: 20px;
+
+    padding-top: 18px;
+
+    border-top: 1px solid var(--border);
+
+    color: var(--text-muted);
+
+    font-size: 13px;
+}
+
+.latest-note-open {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    font-weight: 600;
+
+    transition: gap 0.2s ease;
+}
+
+.latest-note-widget:hover .latest-note-open {
+    gap: 11px;
+}
+
+
+/* ========================================
+   HOME COAL SIDEBAR
+======================================== */
+
+/*
+   The actual Coal styling comes from
+   journal.css.
+
+   These rules only adapt that sidebar
+   to the home dashboard.
+*/
+
+.home-main .journal-sidebar {
+    position: static;
+
+    width: 100%;
+    height: 100%;
+}
+
+.home-main .journal-sidebar-card {
+    height: 100%;
+
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* ========================================
+   MONTHLY COAL PROGRESS
+======================================== */
+
+.home-main .coal-month-progress {
+    margin-top: 20px;
     padding-top: 16px;
     border-top: 1px solid var(--border);
+}
+
+.coal-month-progress-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 9px;
+}
+
+#coal-progress-label {
     color: var(--text-muted);
-    font-size: 13px;
+    font-size: 15px;
+    font-weight: 400;
 }
 
-.widget-furnace-footer i {
-    font-size: 13px;
-    transition: transform 0.2s ease;
+#coal-progress-value {
+    color: var(--navy);
+    font-size: 15px;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
-.widget-furnace:hover .widget-furnace-footer i {
-    transform: translateX(3px);
+.coal-progress-track {
+    width: 100%;
+    height: 10px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--background);
 }
 
-@media (max-width: 768px) {
+.coal-progress-bar {
+    width: 0%;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--navy);
+    transition: width 0.3s ease;
+}
+
+.home-main .journal-sidebar-value {
+    margin-top: auto;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+
+/* ========================================
+   COAL CARD HOVER
+======================================== */
+
+/*
+   The Coal card itself isn't a link,
+   so we don't add the widget hover effect.
+*/
+
+
+/* ========================================
+   MOBILE
+======================================== */
+
+@media (max-width: 900px) {
+
+    .os-dashboard {
+        grid-template-columns: 1fr;
+    }
+
+    .latest-note-widget {
+        min-height: 400px;
+    }
+
+    .home-main .journal-sidebar {
+        height: auto;
+    }
+
+    .home-main .journal-sidebar-card {
+        height: auto;
+    }
+
+    .home-main .journal-sidebar-value {
+        margin-top: 0;
+    }
+}
+
+
+@media (max-width: 600px) {
+
     .home-main {
         padding-top: 20px;
     }
 
+
+    /* HEADER */
+
     .os-header {
         align-items: flex-start;
+
         flex-direction: column;
-        margin-bottom: 24px;
+
         gap: 8px;
+
+        margin-bottom: 24px;
     }
 
     .os-header h1 {
         font-size: 28px;
     }
 
-    .widget-furnace {
-        grid-column: 1 / -1;
-        min-height: 240px;
+    .os-subtitle {
+        font-size: 14px;
+    }
+
+    .os-date {
+        font-size: 13px;
+    }
+
+
+    /* LATEST SCRIPT */
+
+    .latest-note-widget {
+        min-height: 360px;
+
         padding: 20px;
     }
 
-    .widget-furnace-main {
-        gap: 32px;
-        padding: 26px 0;
+    .latest-note-header h2 {
+        font-size: 22px;
     }
 
-    .furnace-streak strong {
-        font-size: 48px;
+    .latest-note-content {
+        padding: 25px 0;
     }
+
+    .latest-note-content p {
+        font-size: 16px;
+        line-height: 1.7;
+    }
+
+    .latest-note-footer {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 10px;
+    }
+
+
+    /* COAL */
+
+    .home-main .journal-sidebar-card {
+        padding: 20px;
+    }
+
 }
