@@ -3,7 +3,7 @@
     "short_name": "Çandarli",
     "description": "Your space for thoughts, ideas, and memories.",
     "start_url": "/index.html",
-    "scope": "/",
+    "scope": "./index.html",
     "display": "standalone",
     "background_color": "#F8FAFC",
     "theme_color": "#09142D",

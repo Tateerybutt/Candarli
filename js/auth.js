@@ -38,13 +38,13 @@ function setupGoogleSignIn() {
         // Redirect away from auth page.
         if (
             window.location.pathname.endsWith(
-                "/auth.html"
+                "auth.html"
             ) ||
             window.location.pathname.endsWith(
                 "auth.html"
             )
         ) {
-            window.location.href = "index.html";
+            window.location.href = index.html;
         }
 
     });
