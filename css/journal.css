@@ -820,7 +820,7 @@
     padding: 5px 8px;
     border-radius: 6px;
     background: var(--navy);
-    color: white;
+    color: var(--surface);
     font-size: 12px;
     font-weight: 600;
     white-space: nowrap;

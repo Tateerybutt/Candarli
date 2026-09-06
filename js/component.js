@@ -1,3 +1,33 @@
+/* ========================================
+   THEME SETTINGS
+======================================== */
+
+const THEME_STORAGE_KEY = "candarli-theme";
+
+
+/* ========================================
+   APPLY SAVED THEME IMMEDIATELY
+======================================== */
+
+(function applyInitialTheme() {
+
+    const savedTheme =
+        localStorage.getItem(
+            THEME_STORAGE_KEY
+        );
+
+    const theme =
+        savedTheme === "dark"
+            ? "dark"
+            : "light";
+
+    document.documentElement.dataset.theme =
+        theme;
+
+})();
+
+
+
 import { auth } from "./firebase.js";
 
 import {
@@ -115,6 +145,7 @@ async function loadComponents() {
             );
 
             setupAuthUI();
+            setupTheme();
         }
 
         /* ================================
@@ -189,6 +220,111 @@ async function loadComponents() {
         console.error(
             "Component loading error:",
             error
+        );
+    }
+}
+
+/* ========================================
+   THEME
+======================================== */
+
+function setupTheme() {
+
+    const toggle =
+        document.querySelector(
+            "#theme-toggle"
+        );
+
+    if (!toggle) {
+        return;
+    }
+
+    updateThemeButton();
+
+
+    toggle.addEventListener(
+        "click",
+        () => {
+
+            const currentTheme =
+                document.documentElement.dataset.theme;
+
+            const newTheme =
+                currentTheme === "dark"
+                    ? "light"
+                    : "dark";
+
+            document.documentElement.dataset.theme =
+                newTheme;
+
+            localStorage.setItem(
+                THEME_STORAGE_KEY,
+                newTheme
+            );
+
+            updateThemeButton();
+
+        }
+    );
+}
+
+
+/* ========================================
+   UPDATE THEME BUTTON
+======================================== */
+
+function updateThemeButton() {
+
+    const toggle =
+        document.querySelector(
+            "#theme-toggle"
+        );
+
+    if (!toggle) {
+        return;
+    }
+
+    const icon =
+        toggle.querySelector(
+            ".theme-toggle-icon i"
+        );
+
+    const currentTheme =
+        document.documentElement.dataset.theme;
+
+
+    if (currentTheme === "dark") {
+
+        if (icon) {
+            icon.className =
+                "fa-solid fa-moon";
+        }
+
+        toggle.setAttribute(
+            "aria-label",
+            "Switch to light mode"
+        );
+
+        toggle.setAttribute(
+            "title",
+            "Switch to light mode"
+        );
+
+    } else {
+
+        if (icon) {
+            icon.className =
+                "fa-solid fa-sun";
+        }
+
+        toggle.setAttribute(
+            "aria-label",
+            "Switch to dark mode"
+        );
+
+        toggle.setAttribute(
+            "title",
+            "Switch to dark mode"
         );
     }
 }

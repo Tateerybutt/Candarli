@@ -98,7 +98,7 @@
 .google-button:hover {
     background: var(--background);
 
-    border-color: #CBD5E1;
+    border-color: var(--border);
 
     box-shadow:
         0 4px 12px rgba(15, 23, 42, 0.08);
@@ -145,7 +145,7 @@
 }
 
 .auth-message.error {
-    color: #DC2626;
+    color: var(--danger);
 }
 
 

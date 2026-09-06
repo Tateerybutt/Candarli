@@ -42,7 +42,7 @@
     border-radius: 10px;
     padding: 11px 18px;
     background: var(--navy);
-    color: #FFFFFF;
+    color: var(--surface);
     font-family: inherit;
     font-size: 14px;
     font-weight: 700;
@@ -120,7 +120,7 @@
 
 .script-card:hover {
     transform: translateY(-2px);
-    border-color: #CBD5E1;
+    border-color: var(--border);
     box-shadow: 0 8px 25px rgba(15, 23, 42, 0.07);
 }
 
@@ -202,11 +202,11 @@
 .script-action:hover {
     color: var(--text);
     background: var(--background);
-    border-color: #CBD5E1;
+    border-color: var(--border);
 }
 
 .script-action.delete:hover {
-    color: #DC2626;
+    color: var(--danger);
 }
 
 

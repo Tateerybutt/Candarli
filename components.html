@@ -4,7 +4,6 @@
 
 <div id="site-pin-lock" class="site-pin-lock" role="dialog" aria-modal="true" aria-labelledby="site-pin-title">
 
-    
     <div class="site-pin-box">
 
         <div class="site-pin-icon">
@@ -23,7 +22,6 @@
 
         </div>
 
-
         <form id="site-pin-form">
 
             <label for="site-pin-input" class="sr-only">
@@ -39,11 +37,9 @@
 
         </form>
 
-
         <p id="site-pin-error" class="site-pin-error" aria-live="polite"></p>
 
     </div>
-    
 
 </div>
 
@@ -54,7 +50,6 @@
 
 <nav id="navbar-component" class="navbar">
 
-    
     <div class="navbar-container">
 
         <!-- Brand -->
@@ -89,6 +84,25 @@
 
         <div class="nav-right">
 
+            <!-- Theme Toggle -->
+            <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode"
+                title="Switch to dark mode">
+            
+                <span class="theme-toggle-track">
+            
+                    <span class="theme-toggle-icon" aria-hidden="true">
+                        <i class="fa-solid fa-sun-bright"></i>
+                    </span>
+            
+                    <span class="theme-toggle-thumb"></span>
+            
+                </span>
+            
+            </button>
+
+
+            <!-- Connection Status -->
+
             <div class="connection-status" id="connection-status" role="status" aria-live="polite">
 
                 <span class="status-dot" aria-hidden="true"></span>
@@ -100,6 +114,8 @@
             </div>
 
 
+            <!-- Profile -->
+
             <button class="nav-link" id="profile-button" type="button">
                 Sign In
             </button>
@@ -107,9 +123,9 @@
         </div>
 
     </div>
-    
 
 </nav>
+
 
 <!-- ================================
      FOOTER
@@ -117,7 +133,6 @@
 
 <footer id="footer-component" class="footer">
 
-    
     <div class="footer-container">
 
         <div class="footer-top">
@@ -151,9 +166,9 @@
         </div>
 
     </div>
-    
 
 </footer>
+
 
 <!-- ================================
      CONFIRMATION MODAL
@@ -161,7 +176,6 @@
 
 <div id="confirm-modal" class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
 
-    
     <div class="confirm-modal-box">
 
         <h2 id="confirm-modal-title">
@@ -185,9 +199,9 @@
         </div>
 
     </div>
-    
 
 </div>
+
 
 <!-- ================================
      NOTIFICATION
@@ -195,11 +209,10 @@
 
 <div id="notification" class="notification" role="status" aria-live="polite" aria-atomic="true">
 
-    
     <span id="notification-message"></span>
-    
 
 </div>
+
 
 <!-- ================================
      EDITOR TOOLBAR

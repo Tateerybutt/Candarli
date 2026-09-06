@@ -24,6 +24,37 @@
     --border: #E2E8F0;
 
     --radius: 14px;
+
+    --shadow: rgba(15, 23, 42, 0.08);
+    --shadow-strong: rgba(15, 23, 42, 0.16);
+
+    --danger: #DC2626;
+}
+
+
+/* ========================================
+   DARK THEME
+======================================== */
+
+[data-theme="dark"] {
+    --navy: #E2E8F0;
+    --navy-light: #CBD5E1;
+
+    --blue: #60A5FA;
+    --blue-dark: #3B82F6;
+
+    --background: #0B1120;
+    --surface: #111827;
+
+    --text: #F1F5F9;
+    --text-muted: #94A3B8;
+
+    --border: #263244;
+
+    --shadow: rgba(0, 0, 0, 0.25);
+    --shadow-strong: rgba(0, 0, 0, 0.45);
+
+    --danger: #F87171;
 }
 
 
@@ -44,6 +75,12 @@
 
 html {
     scroll-behavior: smooth;
+
+    color-scheme: light;
+}
+
+html[data-theme="dark"] {
+    color-scheme: dark;
 }
 
 
@@ -58,6 +95,10 @@ body {
 
     background: var(--background);
     color: var(--text);
+
+    transition:
+        background-color 0.25s ease,
+        color 0.25s ease;
 }
 
 
@@ -72,6 +113,11 @@ body {
     color: var(--text);
 
     border-bottom: 1px solid var(--border);
+
+    transition:
+        background-color 0.25s ease,
+        color 0.25s ease,
+        border-color 0.25s ease;
 }
 
 .navbar-container {
@@ -139,7 +185,9 @@ body {
     font-size: 15px;
     font-weight: 600;
 
-    transition: color 0.2s ease;
+    transition:
+        color 0.2s ease,
+        background-color 0.2s ease;
 }
 
 .nav-link:hover {
@@ -169,6 +217,113 @@ body {
 .nav-link.disabled {
     opacity: 0.35;
     cursor: not-allowed;
+}
+
+
+/* ========================================
+   THEME TOGGLE
+======================================== */
+
+.theme-toggle {
+    width: 52px;
+    height: 28px;
+
+    padding: 0;
+
+    position: relative;
+
+    border: 1px solid var(--border);
+    border-radius: 999px;
+
+    background: var(--background);
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.25s ease,
+        border-color 0.25s ease;
+}
+
+.theme-toggle:hover {
+    border-color: var(--text-muted);
+}
+
+/* ========================================
+   TRACK
+======================================== */
+
+.theme-toggle-track {
+    position: absolute;
+    inset: 0;
+
+    border-radius: inherit;
+}
+
+/* ========================================
+   CURRENT MODE ICON
+======================================== */
+
+.theme-toggle-icon {
+    position: absolute;
+
+    top: 50%;
+    right: 5px;
+
+    width: 16px;
+    height: 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--text-muted);
+
+    font-size: 12px;
+
+    transform: translateY(-50%);
+
+    pointer-events: none;
+
+    z-index: 1;
+}
+
+/* ========================================
+   MOVING THUMB
+======================================== */
+
+.theme-toggle-thumb {
+    position: absolute;
+
+    top: 3px;
+    left: 3px;
+
+    width: 20px;
+    height: 20px;
+
+    border-radius: 50%;
+
+    background: var(--text-muted);
+
+    z-index: 2;
+
+    transition:
+        transform 0.25s ease,
+        background-color 0.25s ease;
+}
+
+/* ========================================
+   DARK MODE
+======================================== */
+
+[data-theme="dark"] .theme-toggle-thumb {
+    transform: translateX(26px);
+
+    background: var(--blue);
+}
+
+[data-theme="dark"] .theme-toggle-icon {
+    left: 5px;
+    right: auto;
 }
 
 
@@ -235,6 +390,7 @@ body {
 
     transition:
         background 0.2s ease,
+        color 0.2s ease,
         transform 0.2s ease;
 }
 
@@ -267,8 +423,8 @@ body {
 ======================================== */
 
 .footer {
-    background: var(--navy);
-    color: #CBD5E1;
+    background: var(--surface);
+    color: var(--text-muted);
 
     margin-top: 80px;
 }
@@ -282,7 +438,7 @@ body {
 }
 
 .footer-logo {
-    color: white;
+    color: var(--navy);
 
     font-size: 22px;
     font-weight: 600;
@@ -334,7 +490,7 @@ body {
     font-size: 13px;
     font-weight: 600;
 
-    box-shadow: 0 5px 18px rgba(9, 20, 45, 0.14);
+    box-shadow: 0 5px 18px var(--shadow-strong);
 
     opacity: 0;
     visibility: hidden;
@@ -387,6 +543,10 @@ body {
         visibility 0.18s ease;
 }
 
+[data-theme="dark"] .confirm-modal {
+    background: rgba(0, 0, 0, 0.62);
+}
+
 .confirm-modal.open {
     opacity: 1;
     visibility: visible;
@@ -406,11 +566,14 @@ body {
 
     border-radius: 14px;
 
-    box-shadow: 0 18px 45px rgba(9, 20, 45, 0.16);
+    box-shadow: 0 18px 45px var(--shadow-strong);
 
     transform: translateY(8px) scale(0.98);
 
-    transition: transform 0.18s ease;
+    transition:
+        transform 0.18s ease,
+        background-color 0.25s ease,
+        border-color 0.25s ease;
 }
 
 .confirm-modal.open .confirm-modal-box {
@@ -452,7 +615,7 @@ body {
     border: none;
     border-radius: 9px;
 
-    background: #dc3545;
+    background: var(--danger);
     color: white;
 
     font-family: inherit;
@@ -466,7 +629,7 @@ body {
 }
 
 #confirm-action:hover {
-    background: #c82333;
+    background: var(--danger);
 }
 
 #confirm-cancel {
@@ -487,7 +650,9 @@ body {
 
     cursor: pointer;
 
-    transition: 0.2s ease;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
 }
 
 #confirm-cancel:hover {
@@ -511,6 +676,10 @@ body {
     border-radius: 14px 14px 0 0;
 
     background: var(--surface);
+
+    transition:
+        background-color 0.25s ease,
+        border-color 0.25s ease;
 }
 
 .editor-tool {
@@ -585,7 +754,6 @@ body {
 }
 
 
-
 /* ========================================
    SITE PIN LOCK
 ======================================== */
@@ -618,6 +786,14 @@ body {
     transition:
         opacity 0.3s ease,
         visibility 0.3s ease;
+}
+
+[data-theme="dark"] .site-pin-lock {
+    background:
+        radial-gradient(circle at 50% 35%,
+            rgba(30, 41, 59, 0.97),
+            rgba(11, 17, 32, 0.99) 55%,
+            rgba(3, 7, 18, 1));
 }
 
 .site-pin-lock.open {
@@ -654,11 +830,15 @@ body {
     border-radius: 24px;
 
     box-shadow:
-        0 30px 80px rgba(15, 23, 42, 0.12),
-        0 8px 24px rgba(15, 23, 42, 0.05);
+        0 30px 80px var(--shadow-strong),
+        0 8px 24px var(--shadow);
 
     animation:
         pinBoxIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+
+    transition:
+        background-color 0.25s ease,
+        border-color 0.25s ease;
 }
 
 @keyframes pinBoxIn {
@@ -773,11 +953,12 @@ body {
         border-color 0.2s ease,
         box-shadow 0.2s ease,
         background 0.2s ease,
+        color 0.2s ease,
         transform 0.2s ease;
 }
 
 #site-pin-input::placeholder {
-    color: #CBD5E1;
+    color: #94A3B8;
 
     font-size: 14px;
     font-weight: 500;
@@ -809,7 +990,7 @@ body {
     border: none;
     border-radius: 12px;
 
-    background: var(--navy);
+    background: #0B132B;
     color: white;
 
     font-family: inherit;
@@ -820,7 +1001,7 @@ body {
     cursor: pointer;
 
     box-shadow:
-        0 6px 14px rgba(15, 23, 42, 0.12);
+        0 6px 14px var(--shadow);
 
     transition:
         background 0.2s ease,
@@ -829,19 +1010,19 @@ body {
 }
 
 #site-pin-submit:hover {
-    background: var(--navy-light);
+    background: #111B36;
 
     transform: translateY(-1px);
 
     box-shadow:
-        0 8px 18px rgba(15, 23, 42, 0.16);
+        0 8px 18px var(--shadow-strong);
 }
 
 #site-pin-submit:active {
     transform: translateY(0);
 
     box-shadow:
-        0 4px 10px rgba(15, 23, 42, 0.10);
+        0 4px 10px var(--shadow);
 }
 
 
@@ -854,7 +1035,7 @@ body {
 
     margin: 13px 0 0 !important;
 
-    color: #DC2626;
+    color: var(--danger);
 
     font-size: 13px !important;
 
@@ -903,6 +1084,15 @@ body {
         display: none;
     }
 
+    .nav-right {
+        gap: 10px;
+    }
+
+    .theme-toggle {
+        width: 36px;
+        height: 36px;
+    }
+
     .main {
         padding: 40px 16px;
     }
@@ -915,7 +1105,7 @@ body {
 
     /* ================================
        PIN LOCK MOBILE
-    ================================ */
+    ================================= */
 
     .site-pin-lock {
         padding: 16px;
@@ -955,3 +1145,12 @@ body {
     }
 }
 
+/* ========================================
+   DARK MODE LOGO
+======================================== */
+
+[data-theme="dark"] .brand img {
+    background: #FFFFFF;
+    border-radius: 8px;
+    padding: 4px;
+}
