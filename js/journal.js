@@ -8,7 +8,8 @@ import {
 } from "./db.js";
 
 import {
-    showConfirmModal
+    showConfirmModal,
+    showNotification
 } from "./component.js";
 
 
@@ -1027,46 +1028,33 @@ function renderEntries() {
 ======================================== */
 
 async function deleteEntryById(id) {
-
-    const entry =
-        await getEntry(id);
-
+    const entry = await getEntry(id);
 
     if (!entry) {
         return;
     }
 
+    const confirmed = await showConfirmModal({
+        title: "Delete this fuel?",
+        message: "This entry will be permanently deleted.",
+        actionText: "Delete"
+    });
 
-    showConfirmModal(
-        "Delete this fuel?",
-        "This entry will be permanently deleted.",
-        async () => {
+    if (!confirmed) {
+        return;
+    }
 
-            try {
+    try {
+        await deleteEntry(id);
 
-                await deleteEntry(
-                    id
-                );
+        showNotification("Fuel deleted.");
 
-                showNotification(
-                    "Fuel deleted."
-                );
+        await loadEntries();
 
-                await loadEntries();
-
-            } catch (error) {
-
-                console.error(
-                    "Failed to delete fuel:",
-                    error
-                );
-
-                showNotification(
-                    "Could not delete the fuel."
-                );
-            }
-        }
-    );
+    } catch (error) {
+        console.error("Failed to delete fuel:", error);
+        showNotification("Could not delete the fuel.");
+    }
 }
 
 
