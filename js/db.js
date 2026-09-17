@@ -25,7 +25,8 @@ const DEFAULT_COAL_DATA = {
     streak: 0,
     smolders: 0,
     rewardedMilestones: [],
-    protectedDates: []
+    protectedDates: [],
+    lastActiveDate: null
 };
 
 /* ========================================
@@ -33,34 +34,157 @@ const DEFAULT_COAL_DATA = {
 ======================================== */
 
 onAuthStateChanged(auth, async user => {
+
     if (!user) {
-        console.log("No authenticated user.");
+
+        console.log(
+            "No authenticated user."
+        );
+
         return;
+
     }
 
-    console.log("Authenticated:", user.email);
+
+    console.log(
+        "Authenticated:",
+        user.email
+    );
+
 
     try {
-        if (!localDB) await openDatabase();
+
+        /*
+           ----------------------------------------
+           OPEN LOCAL DATABASE
+           ----------------------------------------
+        */
+
+        if (!localDB) {
+
+            await openDatabase();
+
+        }
+
     } catch (error) {
-        console.error("Failed to open local database:", error);
+
+        console.error(
+            "Failed to open local database:",
+            error
+        );
+
         return;
+
     }
+
+
+    /*
+       ----------------------------------------
+       OFFLINE
+       ----------------------------------------
+
+       Coal can use its local cache while
+       offline, so we don't need cloud sync.
+    */
 
     if (!navigator.onLine) {
-        console.log("Offline. Cloud sync postponed.");
+
+        console.log(
+            "Offline. Cloud sync postponed."
+        );
+
+        /*
+           Tell Coal that authentication is
+           complete even though cloud sync
+           cannot run.
+
+           Coal will use its cached state.
+        */
+
+        window.dispatchEvent(
+            new CustomEvent(
+                "coal-updated"
+            )
+        );
+
         return;
+
     }
 
+
     try {
+
+        /*
+           ----------------------------------------
+           JOURNALS
+           ----------------------------------------
+        */
+
         await loadCloudEntries();
+
         await syncPendingEntries();
+
+
+        /*
+           ----------------------------------------
+           SCRIPTS
+           ----------------------------------------
+        */
+
         await loadCloudScripts();
+
         await syncPendingScripts();
-        await getCoalData();
+
+
+        /*
+           ----------------------------------------
+           COAL
+           ----------------------------------------
+
+           This fetches the authoritative Coal
+           state from Firestore and refreshes
+           the local cache.
+        */
+
+        const coalData =
+            await getCoalData();
+
+
+        console.log(
+            "Cloud Coal data loaded:",
+            coalData
+        );
+
+
+        /*
+           ----------------------------------------
+           IMPORTANT
+           ----------------------------------------
+
+           coal.js may have rendered once before
+           Firebase authentication completed.
+
+           Tell Coal to render again now that
+           the authenticated cloud state is
+           available.
+        */
+
+        window.dispatchEvent(
+            new CustomEvent(
+                "coal-updated"
+            )
+        );
+
+
     } catch (error) {
-        console.error("Authentication sync failed:", error);
+
+        console.error(
+            "Authentication sync failed:",
+            error
+        );
+
     }
+
 });
 
 /* ========================================
@@ -1228,66 +1352,156 @@ async function loadCloudScripts() {
 ======================================== */
 
 async function getCoalData() {
-    const user = auth.currentUser;
+
+    const user =
+        auth.currentUser;
+
 
     if (!user) {
+
         return {
             ...DEFAULT_COAL_DATA
         };
+
     }
+
 
     if (!navigator.onLine) {
+
         return getCachedCoalData();
+
     }
 
-    try {
-        const userRef = doc(
-            firestoreDB,
-            "users",
-            user.uid
-        );
 
-        const snapshot = await getDoc(userRef);
+    try {
+
+        const userRef =
+            doc(
+                firestoreDB,
+                "users",
+                user.uid
+            );
+
+
+        const snapshot =
+            await getDoc(
+                userRef
+            );
+
 
         if (!snapshot.exists()) {
+
             const initialData = {
                 ...DEFAULT_COAL_DATA
             };
 
-            await setDoc(userRef, initialData, {
-                merge: true
-            });
 
-            cacheCoalData(initialData);
+            await setDoc(
+                userRef,
+                initialData,
+                {
+                    merge: true
+                }
+            );
+
+
+            cacheCoalData(
+                initialData
+            );
+
+
             return initialData;
+
         }
 
-        const data = snapshot.data();
+
+        const data =
+            snapshot.data();
+
 
         const coalData = {
-            streak: Number.isFinite(Number(data.streak))
-                ? Math.max(0, Number(data.streak))
-                : 0,
 
-            smolders: Number.isFinite(Number(data.smolders))
-                ? Math.max(0, Math.min(Number(data.smolders), 3))
-                : 0,
+            streak:
+                Number.isFinite(
+                    Number(data.streak)
+                )
+                    ? Math.max(
+                        0,
+                        Math.floor(
+                            Number(
+                                data.streak
+                            )
+                        )
+                    )
+                    : 0,
 
-            rewardedMilestones: Array.isArray(data.rewardedMilestones)
-                ? data.rewardedMilestones
-                : [],
 
-            protectedDates: Array.isArray(data.protectedDates)
-                ? data.protectedDates
-                : []
+            smolders:
+                Number.isFinite(
+                    Number(data.smolders)
+                )
+                    ? Math.max(
+                        0,
+                        Math.min(
+                            Math.floor(
+                                Number(
+                                    data.smolders
+                                )
+                            ),
+                            3
+                        )
+                    )
+                    : 0,
+
+
+            rewardedMilestones:
+                Array.isArray(
+                    data.rewardedMilestones
+                )
+                    ? data.rewardedMilestones
+                    : [],
+
+
+            protectedDates:
+                Array.isArray(
+                    data.protectedDates
+                )
+                    ? data.protectedDates
+                    : [],
+
+
+            lastActiveDate:
+                typeof data.lastActiveDate ===
+                    "string" &&
+                    /^\d{4}-\d{2}-\d{2}$/.test(
+                        data.lastActiveDate
+                    )
+                    ? data.lastActiveDate
+                    : null
+
         };
 
-        cacheCoalData(coalData);
+
+        cacheCoalData(
+            coalData
+        );
+
+
         return coalData;
+
+
     } catch (error) {
-        console.error("Failed to load Coal data:", error);
+
+        console.error(
+            "Failed to load Coal data:",
+            error
+        );
+
+
         return getCachedCoalData();
+
     }
+
 }
 
 /* ========================================
@@ -1295,54 +1509,143 @@ async function getCoalData() {
 ======================================== */
 
 async function saveCoalData(data) {
-    const user = auth.currentUser;
+
+    const user =
+        auth.currentUser;
+
 
     if (!user) {
-        console.log("No authenticated user. Coal data not saved.");
-        return false;
-    }
 
-    const coalData = {
-        streak: Math.max(0, Number(data?.streak) || 0),
-
-        smolders: Math.max(
-            0,
-            Math.min(Number(data?.smolders) || 0, 3)
-        ),
-
-        rewardedMilestones: Array.isArray(data?.rewardedMilestones)
-            ? data.rewardedMilestones
-            : [],
-
-        protectedDates: Array.isArray(data?.protectedDates)
-            ? data.protectedDates
-            : []
-    };
-
-    cacheCoalData(coalData);
-
-    if (!navigator.onLine) {
-        console.log("Offline. Coal data cached locally.");
-        return false;
-    }
-
-    try {
-        const userRef = doc(
-            firestoreDB,
-            "users",
-            user.uid
+        console.log(
+            "No authenticated user. Coal data not saved."
         );
 
-        await setDoc(userRef, coalData, {
-            merge: true
-        });
 
-        console.log("Coal data synced to Firestore:", coalData);
-        return true;
-    } catch (error) {
-        console.error("Failed to save Coal data:", error);
         return false;
+
     }
+
+
+    const coalData = {
+
+        streak:
+            Math.max(
+                0,
+                Math.floor(
+                    Number(
+                        data?.streak
+                    ) || 0
+                )
+            ),
+
+
+        smolders:
+            Math.max(
+                0,
+                Math.min(
+                    Math.floor(
+                        Number(
+                            data?.smolders
+                        ) || 0
+                    ),
+                    3
+                )
+            ),
+
+
+        rewardedMilestones:
+            Array.isArray(
+                data?.rewardedMilestones
+            )
+                ? data.rewardedMilestones
+                : [],
+
+
+        protectedDates:
+            Array.isArray(
+                data?.protectedDates
+            )
+                ? data.protectedDates
+                : [],
+
+
+        lastActiveDate:
+            typeof data?.lastActiveDate ===
+                "string" &&
+                /^\d{4}-\d{2}-\d{2}$/.test(
+                    data.lastActiveDate
+                )
+                ? data.lastActiveDate
+                : null
+
+    };
+
+
+    /*
+       Always update the local cache first.
+    */
+
+    cacheCoalData(
+        coalData
+    );
+
+
+    /*
+       If offline, keep the cached state.
+    */
+
+    if (!navigator.onLine) {
+
+        console.log(
+            "Offline. Coal data cached locally."
+        );
+
+
+        return false;
+
+    }
+
+
+    try {
+
+        const userRef =
+            doc(
+                firestoreDB,
+                "users",
+                user.uid
+            );
+
+
+        await setDoc(
+            userRef,
+            coalData,
+            {
+                merge: true
+            }
+        );
+
+
+        console.log(
+            "Coal data synced to Firestore:",
+            coalData
+        );
+
+
+        return true;
+
+
+    } catch (error) {
+
+        console.error(
+            "Failed to save Coal data:",
+            error
+        );
+
+
+        return false;
+
+    }
+
 }
 
 /* ========================================
@@ -1365,46 +1668,95 @@ function cacheCoalData(data) {
 ======================================== */
 
 function getCachedCoalData() {
+
     try {
-        const cached = JSON.parse(
-            localStorage.getItem("coal-user-data") || "null"
-        );
+
+        const cached =
+            JSON.parse(
+                localStorage.getItem(
+                    "coal-user-data"
+                ) || "null"
+            );
+
 
         if (cached) {
+
             return {
+
                 ...DEFAULT_COAL_DATA,
+
                 ...cached,
 
-                streak: Math.max(
-                    0,
-                    Number(cached.streak) || 0
-                ),
 
-                smolders: Math.max(
-                    0,
-                    Math.min(Number(cached.smolders) || 0, 3)
-                ),
+                streak:
+                    Math.max(
+                        0,
+                        Math.floor(
+                            Number(
+                                cached.streak
+                            ) || 0
+                        )
+                    ),
 
-                rewardedMilestones: Array.isArray(
-                    cached.rewardedMilestones
-                )
-                    ? cached.rewardedMilestones
-                    : [],
 
-                protectedDates: Array.isArray(
-                    cached.protectedDates
-                )
-                    ? cached.protectedDates
-                    : []
+                smolders:
+                    Math.max(
+                        0,
+                        Math.min(
+                            Math.floor(
+                                Number(
+                                    cached.smolders
+                                ) || 0
+                            ),
+                            3
+                        )
+                    ),
+
+
+                rewardedMilestones:
+                    Array.isArray(
+                        cached.rewardedMilestones
+                    )
+                        ? cached.rewardedMilestones
+                        : [],
+
+
+                protectedDates:
+                    Array.isArray(
+                        cached.protectedDates
+                    )
+                        ? cached.protectedDates
+                        : [],
+
+
+                lastActiveDate:
+                    typeof cached.lastActiveDate ===
+                        "string" &&
+                        /^\d{4}-\d{2}-\d{2}$/.test(
+                            cached.lastActiveDate
+                        )
+                        ? cached.lastActiveDate
+                        : null
+
             };
+
         }
+
+
     } catch (error) {
-        console.error("Failed to read Coal cache:", error);
+
+        console.error(
+            "Failed to read Coal cache:",
+            error
+        );
+
     }
+
 
     return {
         ...DEFAULT_COAL_DATA
     };
+
 }
 
 /* ========================================

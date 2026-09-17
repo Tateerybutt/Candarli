@@ -70,8 +70,25 @@ function getCalendarDate() {
 
 
 /* ========================================
-   DATE KEY
+   DATE HELPERS
 ======================================== */
+
+function normalizeDate(date) {
+
+    const normalized =
+        new Date(date);
+
+    normalized.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+    return normalized;
+
+}
+
 
 function getDateKey(date) {
 
@@ -91,6 +108,95 @@ function getDateKey(date) {
 }
 
 
+function parseDateKey(dateKey) {
+
+    if (
+        typeof dateKey !== "string"
+    ) {
+        return null;
+    }
+
+
+    const match =
+        /^(\d{4})-(\d{2})-(\d{2})$/.exec(
+            dateKey
+        );
+
+
+    if (!match) {
+        return null;
+    }
+
+
+    const year =
+        Number(match[1]);
+
+    const month =
+        Number(match[2]);
+
+    const day =
+        Number(match[3]);
+
+
+    const date =
+        new Date(
+            year,
+            month - 1,
+            day
+        );
+
+
+    date.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    /*
+       Reject impossible dates such as:
+
+       2026-02-31
+    */
+
+    if (
+        date.getFullYear() !== year ||
+        date.getMonth() !== month - 1 ||
+        date.getDate() !== day
+    ) {
+
+        return null;
+
+    }
+
+
+    return date;
+
+}
+
+
+function addDays(date, amount) {
+
+    const result =
+        new Date(date);
+
+    result.setDate(
+        result.getDate() + amount
+    );
+
+    result.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+    return result;
+
+}
+
+
 /* ========================================
    GET ENTRY DATES
 ======================================== */
@@ -103,23 +209,69 @@ function getEntryDates(entries) {
 
     entries.forEach(entry => {
 
-        if (!entry.createdAt) {
+        if (!entry?.createdAt) {
             return;
         }
 
 
-        const date =
-            new Date(
-                entry.createdAt
-            );
+        let date;
+
+
+        /*
+           JavaScript Date
+        */
+
+        if (
+            entry.createdAt instanceof Date
+        ) {
+
+            date =
+                new Date(
+                    entry.createdAt
+                );
+
+        }
+
+
+        /*
+           Firestore Timestamp
+        */
+
+        else if (
+            typeof entry.createdAt?.toDate ===
+            "function"
+        ) {
+
+            date =
+                entry.createdAt.toDate();
+
+        }
+
+
+        /*
+           Numeric timestamp /
+           date string
+        */
+
+        else {
+
+            date =
+                new Date(
+                    entry.createdAt
+                );
+
+        }
 
 
         if (
+            !date ||
             Number.isNaN(
                 date.getTime()
             )
         ) {
+
             return;
+
         }
 
 
@@ -165,6 +317,16 @@ function normalizeCoalData(data) {
             : [];
 
 
+    const lastActiveDate =
+        typeof data?.lastActiveDate ===
+            "string" &&
+            /^\d{4}-\d{2}-\d{2}$/.test(
+                data.lastActiveDate
+            )
+            ? data.lastActiveDate
+            : null;
+
+
     return {
 
         streak:
@@ -203,12 +365,20 @@ function normalizeCoalData(data) {
 
 
         protectedDates:
-            protectedDates
-                .filter(
-                    date =>
-                        typeof date ===
-                        "string"
+            [
+                ...new Set(
+                    protectedDates.filter(
+                        date =>
+                            typeof date ===
+                            "string" &&
+                            /^\d{4}-\d{2}-\d{2}$/
+                                .test(date)
+                    )
                 )
+            ],
+
+
+        lastActiveDate
 
     };
 
@@ -216,8 +386,35 @@ function normalizeCoalData(data) {
 
 
 /* ========================================
-   CALCULATE STREAK WITH SMOLDERS
+   CALCULATE STREAK
 ======================================== */
+
+/*
+   COAL STREAK RULES
+   -----------------
+
+   1. A journal entry fuels the day.
+
+   2. A completed day with no entry:
+        - Smolder available:
+            consume ONE Smolder
+            preserve streak
+        - No Smolder:
+            break streak
+
+   3. TODAY is never treated as missed
+      until the day is actually complete.
+
+   4. A protected date never consumes
+      another Smolder.
+
+   5. Stored streak is the source of truth.
+
+   6. lastActiveDate means:
+      "The last calendar day Coal has
+       completely processed."
+
+*/
 
 function calculateStreak(
     entryDates,
@@ -225,15 +422,19 @@ function calculateStreak(
 ) {
 
     const today =
-        new Date();
+        normalizeDate(
+            new Date()
+        );
 
 
-    today.setHours(
-        0,
-        0,
-        0,
-        0
-    );
+    const todayKey =
+        getDateKey(
+            today
+        );
+
+
+    let streak =
+        coalData.streak;
 
 
     let smolders =
@@ -246,116 +447,349 @@ function calculateStreak(
         );
 
 
-    let streak = 0;
+    let lastActiveDate =
+        coalData.lastActiveDate;
 
 
     /*
-       Today is still in progress.
+       ----------------------------------------
+       FIRST-TIME MIGRATION
+       ----------------------------------------
 
-       If today has no entry yet,
-       start counting from yesterday.
+       Old Coal data didn't have
+       lastActiveDate.
 
-       Today NEVER consumes a Smolder.
+       Preserve the existing streak.
+
+       We use the latest journal date as
+       the baseline instead of rebuilding
+       the streak from scratch.
+
+       IMPORTANT:
+       We do not punish today here.
     */
 
-    const cursor =
-        new Date(today);
+    if (!lastActiveDate) {
+
+        const sortedEntryDates =
+            [...entryDates]
+                .map(parseDateKey)
+                .filter(Boolean)
+                .sort(
+                    (a, b) =>
+                        a.getTime() -
+                        b.getTime()
+                );
 
 
-    if (
-        !entryDates.has(
-            getDateKey(today)
-        )
-    ) {
+        if (
+            sortedEntryDates.length === 0
+        ) {
 
-        cursor.setDate(
-            cursor.getDate() - 1
+            return {
+
+                streak,
+
+                smolders,
+
+                protectedDates: [
+                    ...protectedDates
+                ],
+
+                lastActiveDate: null
+
+            };
+
+        }
+
+
+        const latestEntryDate =
+            sortedEntryDates[
+            sortedEntryDates.length - 1
+            ];
+
+
+        lastActiveDate =
+            getDateKey(
+                latestEntryDate
+            );
+
+
+        return {
+
+            streak,
+
+            smolders,
+
+            protectedDates: [
+                ...protectedDates
+            ],
+
+            lastActiveDate
+
+        };
+
+    }
+
+
+    let lastProcessedDate =
+        parseDateKey(
+            lastActiveDate
         );
+
+
+    /*
+       Invalid date.
+    */
+
+    if (!lastProcessedDate) {
+
+        return {
+
+            streak,
+
+            smolders,
+
+            protectedDates: [
+                ...protectedDates
+            ],
+
+            lastActiveDate: null
+
+        };
 
     }
 
 
     /*
-       Count backwards through the streak.
+       ----------------------------------------
+       WHAT IS THE LAST DAY WE CAN PROCESS?
+       ----------------------------------------
+
+       If today has an entry:
+           today can be processed.
+
+       If today has NO entry:
+           only yesterday and earlier can
+           be processed.
+
+       Therefore today's missing journal
+       can NEVER consume a Smolder.
     */
 
-    while (true) {
+    const processUntil =
+        entryDates.has(todayKey)
+            ? today
+            : addDays(
+                today,
+                -1
+            );
+
+
+    /*
+       Nothing new to process.
+    */
+
+    if (
+        lastProcessedDate >=
+        processUntil
+    ) {
+
+        return {
+
+            streak,
+
+            smolders,
+
+            protectedDates: [
+                ...protectedDates
+            ],
+
+            lastActiveDate
+
+        };
+
+    }
+
+
+    /*
+       ----------------------------------------
+       PROCESS EACH COMPLETED DAY
+       ----------------------------------------
+    */
+
+    let cursor =
+        addDays(
+            lastProcessedDate,
+            1
+        );
+
+
+    while (
+        cursor <= processUntil
+    ) {
 
         const dateKey =
-            getDateKey(cursor);
+            getDateKey(
+                cursor
+            );
 
 
-        /*
-           Entry exists.
-        */
-
-        if (
-            entryDates.has(dateKey)
-        ) {
-
-            streak++;
-
-        }
-
-
-        /*
-           This date was previously protected
-           by a Smolder.
-        */
-
-        else if (
-            protectedDates.has(dateKey)
-        ) {
-
-            streak++;
-
-        }
-
-
-        /*
-           Missing completed day.
-
-           Use a Smolder if available.
-        */
-
-        else if (
-            smolders > 0
-        ) {
-
-            smolders--;
-
-            protectedDates.add(
+        const hasEntry =
+            entryDates.has(
                 dateKey
             );
 
-            streak++;
+
+        /*
+           ====================================
+           JOURNAL ENTRY
+           ====================================
+        */
+
+        if (hasEntry) {
+
+            /*
+               If streak is broken,
+               this entry starts a new streak.
+            */
+
+            if (streak <= 0) {
+
+                streak = 1;
+
+            }
+
+            else {
+
+                streak++;
+
+            }
+
+
+            console.log(
+                `Coal: ${dateKey} fueled. Streak = ${streak}`
+            );
 
         }
 
 
         /*
-           No entry, no protection and no
-           Smolder.
+           ====================================
+           ALREADY PROTECTED
+           ====================================
+        */
 
-           Streak ends.
+        else if (
+            protectedDates.has(
+                dateKey
+            )
+        ) {
+
+            /*
+               Already protected.
+
+               Do NOT consume another Smolder.
+
+               Do NOT increase the streak again.
+            */
+
+            console.log(
+                `Coal: ${dateKey} already protected.`
+            );
+
+        }
+
+
+        /*
+           ====================================
+           MISSED COMPLETED DAY
+           ====================================
         */
 
         else {
 
-            break;
+            /*
+               --------------------------------
+               SMOLDER AVAILABLE
+               --------------------------------
+            */
+
+            if (
+                smolders > 0 &&
+                streak > 0
+            ) {
+
+                smolders--;
+
+                protectedDates.add(
+                    dateKey
+                );
+
+
+                console.log(
+                    `Coal: 🪨 Smolder consumed for ${dateKey}. Streak preserved at ${streak}.`
+                );
+
+            }
+
+
+            /*
+               --------------------------------
+               NO SMOLDER
+               --------------------------------
+            */
+
+            else {
+
+                /*
+                   Streak is broken.
+
+                   We set it to zero immediately.
+
+                   The next fueled day will start
+                   a new streak at 1.
+                */
+
+                streak = 0;
+
+
+                console.log(
+                    `Coal: ❌ Streak broken on ${dateKey}. No Smolders available.`
+                );
+
+            }
 
         }
 
 
         /*
-           Move backwards one day.
+           This day has now been processed.
         */
 
-        cursor.setDate(
-            cursor.getDate() - 1
-        );
+        lastProcessedDate =
+            cursor;
+
+
+        cursor =
+            addDays(
+                cursor,
+                1
+            );
 
     }
+
+
+    /*
+       ----------------------------------------
+       SAVE LAST PROCESSED DATE
+       ----------------------------------------
+    */
+
+    lastActiveDate =
+        getDateKey(
+            lastProcessedDate
+        );
 
 
     return {
@@ -366,7 +800,9 @@ function calculateStreak(
 
         protectedDates: [
             ...protectedDates
-        ]
+        ],
+
+        lastActiveDate
 
     };
 
@@ -380,7 +816,8 @@ function calculateStreak(
 async function processStreakRewards(
     rawStreak,
     coalData,
-    protectedDates
+    protectedDates,
+    lastActiveDate
 ) {
 
     let smolders =
@@ -394,8 +831,11 @@ async function processStreakRewards(
 
 
     /*
-       Milestones from a previous broken
-       streak are no longer valid.
+       Remove milestones that are above
+       the current streak.
+
+       This allows a future streak to
+       earn them again after a break.
     */
 
     rewardedMilestones =
@@ -406,8 +846,7 @@ async function processStreakRewards(
 
 
     /*
-       Determine every milestone reached
-       by the current streak.
+       Determine milestones reached.
     */
 
     const earnedMilestones =
@@ -431,12 +870,12 @@ async function processStreakRewards(
     }
 
 
-    let changed = false;
+    let changed =
+        false;
 
 
     /*
-       Grant rewards that have not already
-       been granted during this streak.
+       Grant rewards.
     */
 
     for (
@@ -479,20 +918,24 @@ async function processStreakRewards(
 
 
     /*
-       Sort milestones.
+       Sort.
     */
 
     rewardedMilestones.sort(
-        (a, b) => a - b
+        (a, b) =>
+            a - b
     );
 
 
     /*
-       Detect streak changes.
+       ----------------------------------------
+       DETECT CHANGES
+       ----------------------------------------
     */
 
     if (
-        coalData.streak !== rawStreak
+        coalData.streak !==
+        rawStreak
     ) {
 
         changed = true;
@@ -500,22 +943,15 @@ async function processStreakRewards(
     }
 
 
-    /*
-       Detect Smolder changes.
-    */
-
     if (
-        coalData.smolders !== smolders
+        coalData.smolders !==
+        smolders
     ) {
 
         changed = true;
 
     }
 
-
-    /*
-       Detect protected date changes.
-    */
 
     const oldProtectedDates =
         [
@@ -525,7 +961,9 @@ async function processStreakRewards(
 
     const newProtectedDates =
         [
-            ...protectedDates
+            ...new Set(
+                protectedDates
+            )
         ].sort();
 
 
@@ -543,10 +981,6 @@ async function processStreakRewards(
     }
 
 
-    /*
-       Detect milestone changes.
-    */
-
     if (
         JSON.stringify(
             coalData.rewardedMilestones
@@ -561,8 +995,20 @@ async function processStreakRewards(
     }
 
 
+    if (
+        coalData.lastActiveDate !==
+        lastActiveDate
+    ) {
+
+        changed = true;
+
+    }
+
+
     /*
-       Save updated Coal state.
+       ----------------------------------------
+       SAVE
+       ----------------------------------------
     */
 
     if (changed) {
@@ -577,7 +1023,9 @@ async function processStreakRewards(
             rewardedMilestones,
 
             protectedDates:
-                newProtectedDates
+                newProtectedDates,
+
+            lastActiveDate
 
         });
 
@@ -594,7 +1042,9 @@ async function processStreakRewards(
         rewardedMilestones,
 
         protectedDates:
-            newProtectedDates
+            newProtectedDates,
+
+        lastActiveDate
 
     };
 
@@ -650,16 +1100,27 @@ function updateCoalUI(
 
 async function renderCalendar() {
 
+    console.log("🔥 renderCalendar() STARTED");
+
+
     if (!calendarGrid) {
+
+        console.warn(
+            "⚠️ Coal calendar grid not found."
+        );
+
         return;
+
     }
 
 
     try {
 
-        /* ====================================
+        /*
+           ------------------------------------
            GET JOURNAL ENTRIES
-        ==================================== */
+           ------------------------------------
+        */
 
         const entries =
             await getEntries();
@@ -671,9 +1132,17 @@ async function renderCalendar() {
             );
 
 
-        /* ====================================
+        console.log(
+            "🔥 Coal entry dates:",
+            [...entryDates]
+        );
+
+
+        /*
+           ------------------------------------
            GET COAL DATA
-        ==================================== */
+           ------------------------------------
+        */
 
         const storedCoalData =
             await getCoalData();
@@ -685,9 +1154,17 @@ async function renderCalendar() {
             );
 
 
-        /* ====================================
-           CALCULATE STREAK
-        ==================================== */
+        console.log(
+            "🔥 Stored Coal data:",
+            coalData
+        );
+
+
+        /*
+           ------------------------------------
+           CALCULATE
+           ------------------------------------
+        */
 
         const streakData =
             calculateStreak(
@@ -696,9 +1173,17 @@ async function renderCalendar() {
             );
 
 
-        /* ====================================
-           PROCESS REWARDS
-        ==================================== */
+        console.log(
+            "🔥 Calculated Coal:",
+            streakData
+        );
+
+
+        /*
+           ------------------------------------
+           REWARDS + SAVE
+           ------------------------------------
+        */
 
         const updatedCoal =
             await processStreakRewards(
@@ -709,17 +1194,34 @@ async function renderCalendar() {
                     ...coalData,
 
                     smolders:
-                        streakData.smolders
+                        streakData.smolders,
+
+                    protectedDates:
+                        streakData.protectedDates,
+
+                    lastActiveDate:
+                        streakData.lastActiveDate
+
                 },
 
-                streakData.protectedDates
+                streakData.protectedDates,
+
+                streakData.lastActiveDate
 
             );
 
 
-        /* ====================================
+        console.log(
+            "🔥 Final Coal state:",
+            updatedCoal
+        );
+
+
+        /*
+           ------------------------------------
            UPDATE UI
-        ==================================== */
+           ------------------------------------
+        */
 
         updateCoalUI(
 
@@ -730,20 +1232,42 @@ async function renderCalendar() {
         );
 
 
-        /* ====================================
-           CURRENT MONTH
-        ==================================== */
+        /*
+           Check DOM immediately after
+           Coal updates it.
+        */
+
+        console.log(
+            "🔥 DOM immediately after update:",
+            {
+
+                streak:
+                    document.querySelector(
+                        "#streak-value"
+                    )?.textContent,
+
+                smolders:
+                    document.querySelector(
+                        "#smolder-value"
+                    )?.textContent
+
+            }
+        );
+
+
+        /*
+           ------------------------------------
+           CALENDAR MONTH
+           ------------------------------------
+        */
 
         const year =
             calendarDate.getFullYear();
 
+
         const month =
             calendarDate.getMonth();
 
-
-        /* ====================================
-           MONTH TITLE
-        ==================================== */
 
         if (calendarMonth) {
 
@@ -759,9 +1283,11 @@ async function renderCalendar() {
         }
 
 
-        /* ====================================
+        /*
+           ------------------------------------
            MONTH INFORMATION
-        ==================================== */
+           ------------------------------------
+        */
 
         const firstDay =
             new Date(
@@ -780,7 +1306,7 @@ async function renderCalendar() {
 
 
         /*
-           Calendar starts on Monday.
+           Monday-first calendar.
         */
 
         const startingDay =
@@ -790,33 +1316,33 @@ async function renderCalendar() {
             ) % 7;
 
 
-        /* ====================================
+        /*
+           ------------------------------------
            TODAY
-        ==================================== */
+           ------------------------------------
+        */
 
         const today =
-            new Date();
+            normalizeDate(
+                new Date()
+            );
 
 
-        today.setHours(
-            0,
-            0,
-            0,
-            0
-        );
-
-
-        /* ====================================
+        /*
+           ------------------------------------
            CLEAR CALENDAR
-        ==================================== */
+           ------------------------------------
+        */
 
         calendarGrid.innerHTML =
             "";
 
 
-        /* ====================================
+        /*
+           ------------------------------------
            EMPTY CELLS
-        ==================================== */
+           ------------------------------------
+        */
 
         for (
             let i = 0;
@@ -841,9 +1367,11 @@ async function renderCalendar() {
         }
 
 
-        /* ====================================
+        /*
+           ------------------------------------
            DAYS
-        ==================================== */
+           ------------------------------------
+        */
 
         for (
             let day = 1;
@@ -906,11 +1434,15 @@ async function renderCalendar() {
                 );
 
 
-            /* ==================================
+            /*
+               =================================
                FUTURE
-            ================================== */
+               =================================
+            */
 
-            if (date > today) {
+            if (
+                date > today
+            ) {
 
                 dayElement.classList.add(
                     "future"
@@ -930,11 +1462,15 @@ async function renderCalendar() {
             }
 
 
-            /* ==================================
-               ENTRY EXISTS
-            ================================== */
+            /*
+               =================================
+               JOURNAL ENTRY
+               =================================
+            */
 
-            else if (hasEntry) {
+            else if (
+                hasEntry
+            ) {
 
                 dayElement.classList.add(
                     "fuel"
@@ -958,11 +1494,15 @@ async function renderCalendar() {
             }
 
 
-            /* ==================================
+            /*
+               =================================
                SMOLDER PROTECTED
-            ================================== */
+               =================================
+            */
 
-            else if (isProtected) {
+            else if (
+                isProtected
+            ) {
 
                 dayElement.classList.add(
                     "protected"
@@ -986,9 +1526,11 @@ async function renderCalendar() {
             }
 
 
-            /* ==================================
-               TODAY — NO ENTRY
-            ================================== */
+            /*
+               =================================
+               TODAY — NOT FUELED
+               =================================
+            */
 
             else if (
                 date.getTime() ===
@@ -1017,9 +1559,11 @@ async function renderCalendar() {
             }
 
 
-            /* ==================================
-               PREVIOUS DAY — NO ENTRY
-            ================================== */
+            /*
+               =================================
+               PREVIOUS UNFUELED DAY
+               =================================
+            */
 
             else {
 
@@ -1032,15 +1576,8 @@ async function renderCalendar() {
                     <img
                         src="assets/icons/coal-frozen.png"
                         alt=""
-                        class="calendar-coal-icon"
-                    >
-
-                    <span class="calendar-tooltip">
-                        ${dateLabel}
-                        <br>
-                        Not Fueled
-                    </span>
-                `;
+                        class="calendar-coal-icon
+                    `;
 
             }
 
@@ -1052,9 +1589,11 @@ async function renderCalendar() {
         }
 
 
-        /* ====================================
+        /*
+           ------------------------------------
            CALENDAR UPDATED
-        ==================================== */
+           ------------------------------------
+        */
 
         window.dispatchEvent(
             new CustomEvent(
@@ -1195,10 +1734,19 @@ async function getCurrentCoalStats() {
                 ...coalData,
 
                 smolders:
-                    streakData.smolders
+                    streakData.smolders,
+
+                protectedDates:
+                    streakData.protectedDates,
+
+                lastActiveDate:
+                    streakData.lastActiveDate
+
             },
 
-            streakData.protectedDates
+            streakData.protectedDates,
+
+            streakData.lastActiveDate
 
         );
 
@@ -1244,6 +1792,204 @@ document.addEventListener(
     "DOMContentLoaded",
     initializeCoal
 );
+
+
+/* ========================================
+   DEV TEST
+======================================== */
+
+/*
+   IMPORTANT:
+
+   This test DOES NOT modify your real
+   Coal data.
+
+   It creates a fake scenario in memory:
+
+       streak = 13
+       Smolders = 1
+       yesterday = missed
+
+   Then it runs the SAME calculateStreak()
+   function used by real Coal.
+
+   Usage:
+
+       window.testSmolder()
+
+*/
+
+window.testSmolder = function () {
+
+    try {
+
+        const today =
+            normalizeDate(
+                new Date()
+            );
+
+
+        const yesterday =
+            addDays(
+                today,
+                -1
+            );
+
+
+        const dayBefore =
+            addDays(
+                today,
+                -2
+            );
+
+
+        /*
+           Fake journal history:
+
+           Day before yesterday = fueled
+           Yesterday = missed
+           Today = not processed
+        */
+
+        const fakeEntryDates =
+            new Set([
+                getDateKey(
+                    dayBefore
+                )
+            ]);
+
+
+        const fakeCoalData = {
+
+            streak: 13,
+
+            smolders: 1,
+
+            rewardedMilestones: [
+                7
+            ],
+
+            protectedDates: [],
+
+            lastActiveDate:
+                getDateKey(
+                    dayBefore
+                )
+
+        };
+
+
+        console.group(
+            "🔥 Çandarli Smolder Test"
+        );
+
+
+        console.log(
+            "Scenario:"
+        );
+
+
+        console.log(
+            `• Streak: ${fakeCoalData.streak}`
+        );
+
+
+        console.log(
+            `• Smolders: ${fakeCoalData.smolders}`
+        );
+
+
+        console.log(
+            `• Last active: ${fakeCoalData.lastActiveDate}`
+        );
+
+
+        console.log(
+            `• Missed day: ${getDateKey(yesterday)}`
+        );
+
+
+        /*
+           Run the REAL streak engine.
+        */
+
+        const result =
+            calculateStreak(
+                fakeEntryDates,
+                fakeCoalData
+            );
+
+
+        console.log(
+            "Result:",
+            result
+        );
+
+
+        /*
+           Expected:
+        */
+
+        if (
+            result.streak === 13 &&
+            result.smolders === 0 &&
+            result.protectedDates.includes(
+                getDateKey(
+                    yesterday
+                )
+            )
+        ) {
+
+            console.log(
+                "✅ TEST PASSED"
+            );
+
+
+            console.log(
+                "13-day streak preserved."
+            );
+
+
+            console.log(
+                "1 Smolder consumed."
+            );
+
+
+            console.log(
+                "Yesterday protected."
+            );
+
+
+            console.log(
+                "Today's streak was NOT touched."
+            );
+
+        }
+
+        else {
+
+            console.error(
+                "❌ TEST FAILED"
+            );
+
+        }
+
+
+        console.groupEnd();
+
+
+        return result;
+
+    } catch (error) {
+
+        console.error(
+            "❌ Smolder test failed:",
+            error
+        );
+
+    }
+
+};
 
 
 /* ========================================

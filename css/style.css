@@ -1088,9 +1088,24 @@ body {
         gap: 10px;
     }
 
+    /* ========================================
+   MOBILE THEME TOGGLE
+======================================== */
+
     .theme-toggle {
-        width: 36px;
-        height: 36px;
+        width: 46px;
+        height: 28px;
+
+        flex-shrink: 0;
+    }
+
+    .theme-toggle-thumb {
+        width: 20px;
+        height: 20px;
+    }
+
+    [data-theme="dark"] .theme-toggle-thumb {
+        transform: translateX(18px);
     }
 
     .main {
